@@ -131,7 +131,7 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        logger.info("plainText:{}, serverSignature:{} clientSignature:{}",
+        logger.debug("plainText:{}, serverSignature:{} clientSignature:{}",
                 builder.plaintext(), serverSignature, authHeader.getSignature());
 
         if (!serverSignature.equals(authHeader.getSignature())) {

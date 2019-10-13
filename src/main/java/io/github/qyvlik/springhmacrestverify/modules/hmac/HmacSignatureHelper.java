@@ -26,9 +26,9 @@ public class HmacSignatureHelper {
             }
 
             builder.method(request.getMethod())
-                    .scheme(request.getScheme())
-                    .host(host)
-                    .port(request.getServerPort())
+                    .scheme(request.getScheme())                // todo replace
+                    .host(host)                                 // todo replace
+                    .port(request.getServerPort())              // todo replace
                     .contentType(request.getContentType() == null ? "" : request.getContentType())
                     .path(request.getRequestURI())
                     .query(request.getQueryString() == null ? "" : request.getQueryString())
