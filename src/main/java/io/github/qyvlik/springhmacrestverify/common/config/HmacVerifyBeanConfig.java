@@ -11,6 +11,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.filter.HiddenHttpMethodFilter;
+import org.springframework.web.filter.HttpPutFormContentFilter;
 
 @Configuration
 @EnableConfigurationProperties(HmacVerifyProperties.class)
@@ -29,7 +32,7 @@ public class HmacVerifyBeanConfig {
         registration.setName("cachingRequestFilter");
         registration.setFilter(new CachingRequestFilter());
         registration.addUrlPatterns("/*");
-        registration.setOrder(1);                               // first filter
+        registration.setOrder(Ordered.HIGHEST_PRECEDENCE);                               // first filter
 
         return registration;
     }
@@ -53,4 +56,28 @@ public class HmacVerifyBeanConfig {
                 hmacVerifyProperties.getHeader().getAuthorization()
         );
     }
+
+//    @Bean
+//    public HttpPutFormContentFilter httpPutFormContentFilter() {
+//        return new HttpPutFormContentFilter();
+//    }
+//    @Bean
+//    public FilterRegistrationBean disableSpringBootHttpPutFormContentFilter(HttpPutFormContentFilter filter) {
+//        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+//        filterRegistrationBean.setFilter(filter);
+//        filterRegistrationBean.setEnabled(false);
+//        return filterRegistrationBean;
+//    }
+//    @Bean
+//    public HiddenHttpMethodFilter hiddenHttpMethodFilter() {
+//        return new HiddenHttpMethodFilter();
+//    }
+//    @Bean
+//    public FilterRegistrationBean disableSpringBootHiddenHttpMethodFilter(HiddenHttpMethodFilter filter) {
+//        FilterRegistrationBean filterRegistrationBean = new FilterRegistrationBean();
+//        filterRegistrationBean.setFilter(filter);
+//        filterRegistrationBean.setEnabled(false);
+//        filterRegistrationBean.setOrder(2);                               // first filter
+//        return filterRegistrationBean;
+//    }
 }

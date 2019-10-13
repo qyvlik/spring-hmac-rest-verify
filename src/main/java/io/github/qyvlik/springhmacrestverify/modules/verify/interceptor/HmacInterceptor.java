@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 
 public class HmacInterceptor implements HandlerInterceptor {
@@ -63,9 +64,31 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        if (!(request instanceof CachingRequestWrapper)) {
+        CachingRequestWrapper cachingRequestWrapper = null;
+
+        if (request instanceof HttpServletRequestWrapper) {
+            if (request instanceof CachingRequestWrapper) {
+                cachingRequestWrapper = (CachingRequestWrapper) request;
+            } else {
+                if (((HttpServletRequestWrapper) request).getRequest() instanceof CachingRequestWrapper) {
+                    cachingRequestWrapper = (CachingRequestWrapper) ((HttpServletRequestWrapper) request).getRequest();
+                }
+            }
+        }
+
+        if (cachingRequestWrapper == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " request is not CachingRequestWrapper");
+            ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 500);
+            return false;
+        }
+
+        HmacSignatureBuilder builder =
+                HmacSignatureHelper.getBuilderFromRequest(cachingRequestWrapper, nonce);
+
+        if (builder == null) {
+            ResponseObject<String> responseObject = new ResponseObject<>(
+                    20500, request.getRequestURI() + " get hmac signature builder from request failure");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 500);
             return false;
         }
@@ -75,16 +98,6 @@ public class HmacInterceptor implements HandlerInterceptor {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20401, request.getRequestURI() + " header " + accessKeyHeaderName + " value is invalidate");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
-            return false;
-        }
-
-        HmacSignatureBuilder builder =
-                HmacSignatureHelper.getBuilderFromRequest((CachingRequestWrapper) request, nonce);
-
-        if (builder == null) {
-            ResponseObject<String> responseObject = new ResponseObject<>(
-                    20500, request.getRequestURI() + " get hmac signature builder from request failure");
-            ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 500);
             return false;
         }
 
@@ -118,7 +131,8 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        logger.debug("plainText:{}, serverSignature:{}", builder.plaintext(), serverSignature);
+        logger.info("plainText:{}, serverSignature:{} clientSignature:{}",
+                builder.plaintext(), serverSignature, authHeader.getSignature());
 
         if (!serverSignature.equals(authHeader.getSignature())) {
             ResponseObject<String> responseObject = new ResponseObject<>(

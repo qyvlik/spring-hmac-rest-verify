@@ -14,7 +14,7 @@ public class CachingRequestFilter implements Filter {
         ServletRequest requestWrapper = null;
 
         if (servletRequest instanceof HttpServletRequest) {
-            requestWrapper = new CachingRequestWrapper((HttpServletRequest) servletRequest);
+            requestWrapper = new CachingRequestWrapper((HttpServletRequest) servletRequest, true);
 
             filterChain.doFilter(requestWrapper, servletResponse);
         } else {
