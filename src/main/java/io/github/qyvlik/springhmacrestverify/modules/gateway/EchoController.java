@@ -25,8 +25,8 @@ public class EchoController {
             value = "api/v1/put-form",
             consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseObject<String> echoPutForm(HttpServletRequest request, String param1, String param2) {
-        return new ResponseObject<>("param1: " + param1 + ", param2: " + param2);
+    public ResponseObject<String> echoPutForm(HttpServletRequest request, String param1, String param2, String param3) {
+        return new ResponseObject<>("param1: " + param1 + ", param2: " + param2 + ", param3:" + param3);
     }
 
     @RequestMapping(
