@@ -29,7 +29,7 @@ public class HmacVerifyBeanConfig {
 
         registration.setName("cachingRequestFilter");
         registration.setFilter(new CachingRequestFilter());
-        registration.addUrlPatterns("/*");                          // or `/api/*`
+        registration.addUrlPatterns("/api/v1/*");
         registration.setOrder(Ordered.HIGHEST_PRECEDENCE);          // first filter
 
         return registration;

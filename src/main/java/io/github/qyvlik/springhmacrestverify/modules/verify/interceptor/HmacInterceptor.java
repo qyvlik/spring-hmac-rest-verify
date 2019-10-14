@@ -1,6 +1,8 @@
 package io.github.qyvlik.springhmacrestverify.modules.verify.interceptor;
 
 import com.alibaba.fastjson.JSON;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
 import io.github.qyvlik.springhmacrestverify.common.utils.ServletUtils;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.AuthHeader;
@@ -16,11 +18,21 @@ import org.springframework.web.servlet.HandlerInterceptor;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 public class HmacInterceptor implements HandlerInterceptor {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    public static final List<String> notSupportMethodList =
+            ImmutableList.<String>builder().add("CONNECT", "OPTIONS", "TRACE", "PATCH").build();
 
+    public static final Map<String, String> algorithmMap =
+            ImmutableMap.<String, String>builder()
+                    .put("HmacSHA256".toLowerCase(), "HmacSHA256")
+                    .put("HmacSHA512".toLowerCase(), "HmacSHA512")
+                    .build();
+
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     private CredentialsProvider credentialsProvider;
     private String nonceHeaderName;
     private String accessKeyHeaderName;
@@ -39,6 +51,16 @@ public class HmacInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request,
                              HttpServletResponse response,
                              Object handler) throws Exception {
+
+        String httpMethod = request.getMethod();
+        if (notSupportMethodList.contains(httpMethod)) {
+            ResponseObject<String> responseObject = new ResponseObject<>(
+                    20405, request.getRequestURI() + " not support http method : " + httpMethod);
+            ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 405);
+            return false;
+        }
+
+        // todo check content-type
 
         String accessKey = request.getHeader(accessKeyHeaderName);
         if (StringUtils.isBlank(accessKey)) {
@@ -65,7 +87,6 @@ public class HmacInterceptor implements HandlerInterceptor {
         }
 
         CachingRequestWrapper cachingRequestWrapper = null;
-
         if (request instanceof HttpServletRequestWrapper) {
             if (request instanceof CachingRequestWrapper) {
                 cachingRequestWrapper = (CachingRequestWrapper) request;
@@ -85,7 +106,6 @@ public class HmacInterceptor implements HandlerInterceptor {
 
         HmacSignatureBuilder builder =
                 HmacSignatureHelper.getBuilderFromRequest(cachingRequestWrapper, nonce);
-
         if (builder == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " get hmac signature builder from request failure");
@@ -116,6 +136,13 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
+        if (!algorithmMap.containsKey(authHeader.getAlgorithm().toLowerCase())) {
+            ResponseObject<String> responseObject = new ResponseObject<>(
+                    20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate, algorithm: " + authHeader.getAlgorithm() + " not support");
+            ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
+            return false;
+        }
+
         if (StringUtils.isBlank(authHeader.getSignature())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate, lost signature");
@@ -123,7 +150,10 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String serverSignature = builder.signature(credential.getSecretKey(), authHeader.getAlgorithm());
+        String serverSignature = builder.signature(
+                credential.getSecretKey(),
+                algorithmMap.get(authHeader.getAlgorithm().toLowerCase()));
+
         if (StringUtils.isBlank(serverSignature)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " signature failure");

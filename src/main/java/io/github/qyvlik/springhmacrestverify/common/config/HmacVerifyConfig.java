@@ -16,8 +16,7 @@ public class HmacVerifyConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
 
         registry.addInterceptor(hmacInterceptor)
-                .addPathPatterns("/**")
+                .addPathPatterns("/api/v1/**")
         ;
     }
-
 }
