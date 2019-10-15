@@ -1,6 +1,7 @@
 package io.github.qyvlik.springhmacrestverify.common.utils;
 
 import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignatureBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,15 @@ public class HmacSignatureBuilderTest {
 
         String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
 
+        String signatureStr = "ZIqRSAw/hcfe49gvbPNkEmoWY+/FLlQ+ibKVJBHPl9Q=";
+
         logger.info("plaintext:{}", plaintext);
 
-        logger.info("signature base64:{}", builder.signature(secretKey, "HmacSHA256"));
+        String signature = builder.signature(secretKey, "HmacSHA256");
+
+        Assert.assertEquals(signatureStr, signature);
+
+        logger.info("signature base64:{}", signature);
     }
 
     @Test

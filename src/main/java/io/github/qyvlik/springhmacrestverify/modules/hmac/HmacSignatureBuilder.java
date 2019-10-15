@@ -107,7 +107,6 @@ public class HmacSignatureBuilder {
         return this;
     }
 
-
     private static class PlainText {
         private String method;
         private String scheme;

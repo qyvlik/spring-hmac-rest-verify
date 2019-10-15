@@ -46,6 +46,11 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
             int contentLength = getRequest().getContentLength();
             if (contentLength > 0) {
                 payload = StreamUtils.copyToByteArray(getRequest().getInputStream());
+                if (payload.length != contentLength) {
+                    throw new IOException("request inputStream read payload length : " + payload.length
+                            + " not equals content-length : " + contentLength
+                            + ", does the request inputStream already closed?");
+                }
             }
         }
         return payload;

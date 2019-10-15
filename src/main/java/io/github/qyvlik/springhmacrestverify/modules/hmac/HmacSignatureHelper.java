@@ -27,12 +27,12 @@ public class HmacSignatureHelper {
         try {
             HmacSignatureBuilder builder = HmacSignatureBuilder.create();
 
-            builder.method(request.getMethod())
+            builder.method(getRequest().getMethod())
                     .scheme(getServerScheme())
                     .host(getServerHost())
                     .port(getServerPort())
-                    .contentType(request.getContentType() == null ? "" : request.getContentType())
-                    .path(request.getRequestURI())
+                    .contentType(getRequest().getContentType() == null ? "" : getRequest().getContentType())
+                    .path(getRequest().getRequestURI())
                     .query(getQueryString())
                     .body(getBody())
                     .nonce(nonce);

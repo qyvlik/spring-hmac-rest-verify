@@ -54,8 +54,6 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        // todo check content-type
-
         String accessKey = request.getHeader(config.getHeaderOfAccessKey());
         if (StringUtils.isBlank(accessKey)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
@@ -101,9 +99,9 @@ public class HmacInterceptor implements HandlerInterceptor {
         HmacSignatureHelper helper = HmacSignatureHelper.Builder.create()
                 .encoding(UTF8)
                 .request(cachingRequestWrapper)
-                .serverHost(null)
-                .serverPort(null)
-                .serverScheme(null)
+                .serverScheme(config.getServerScheme())
+                .serverHost(config.getServerHost())
+                .serverPort(config.getServerPort())
                 .build();
 
         HmacSignatureBuilder builder = helper.createHmacSignatureBuilder(nonce);
