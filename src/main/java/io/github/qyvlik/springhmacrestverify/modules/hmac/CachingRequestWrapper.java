@@ -27,14 +27,11 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
     private MultiValueMap<String, String> formParams = new LinkedMultiValueMap<>(0);
 
-    public CachingRequestWrapper(HttpServletRequest request, boolean loadFirst) throws IOException {
+    CachingRequestWrapper(HttpServletRequest request) {
         super(request);
-        if (loadFirst) {
-            getPayload();
-        }
     }
 
-    public void setFormParams(MultiValueMap<String, String> formParams) {
+    void setFormParams(MultiValueMap<String, String> formParams) {
         if (formParams != null) {
             this.formParams = formParams;
         }
@@ -156,11 +153,10 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
         }
 
         public HttpServletRequest build() throws IOException {
-            String method = this.servletRequest.getMethod();
+            String method = servletRequest.getMethod();
 
-            if (this.methodList.contains(method)) {
-                CachingRequestWrapper cachingRequestWrapper = new CachingRequestWrapper(
-                        this.servletRequest, true);
+            if (methodList.contains(method)) {
+                CachingRequestWrapper cachingRequestWrapper = new CachingRequestWrapper(servletRequest);
 
                 cachingRequestWrapper.setFormParams(parseIfNecessary(cachingRequestWrapper));
 
@@ -197,5 +193,4 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
             }
         }
     }
-
 }

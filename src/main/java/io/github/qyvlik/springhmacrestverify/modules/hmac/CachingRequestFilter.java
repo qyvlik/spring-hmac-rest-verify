@@ -1,7 +1,6 @@
 package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
 import com.google.common.collect.ImmutableList;
-import org.apache.catalina.connector.RequestFacade;
 import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 
@@ -27,7 +26,7 @@ public class CachingRequestFilter implements Filter {
                          FilterChain filterChain)
             throws IOException, ServletException {
 
-        if (!(servletRequest instanceof CachingRequestWrapper) && servletRequest instanceof RequestFacade) {
+        if (!(servletRequest instanceof CachingRequestWrapper)) {
 
             ServletRequest requestWrapper = CachingRequestWrapper.Builder.create()
                     .request(servletRequest)
