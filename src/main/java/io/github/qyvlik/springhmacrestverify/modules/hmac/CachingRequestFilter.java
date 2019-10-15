@@ -18,7 +18,15 @@ public class CachingRequestFilter implements Filter {
     private static final List<String> supportMethods =
             ImmutableList.<String>builder().add("GET", "HEAD", "POST", "PUT", "DELETE").build();
 
+    private boolean mock = false;
     private FormHttpMessageConverter formConverter = new AllEncompassingFormHttpMessageConverter();
+
+    public static CachingRequestFilter createMockCachingRequestFilter() {
+        CachingRequestFilter filter = new CachingRequestFilter();
+        filter.mock = true;
+        return filter;
+    }
+
 
     @Override
     public void doFilter(ServletRequest servletRequest,
@@ -32,6 +40,7 @@ public class CachingRequestFilter implements Filter {
                     .request(servletRequest)
                     .convert(formConverter)
                     .methods(supportMethods)
+                    .mock(mock)
                     .build();
 
             filterChain.doFilter(requestWrapper, servletResponse);

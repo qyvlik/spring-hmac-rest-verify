@@ -60,7 +60,6 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
     public ServletInputStream getInputStream() throws IOException {
         final ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(getPayload());
         return new ServletInputStream() {
-
             @Override
             public int read() throws IOException {
                 return byteArrayInputStream.read();
@@ -129,11 +128,12 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
     public static class Builder {
 
-        private static final String parseFormBodyMethod = "POST";
+        private static final String PARSE_FORM_BODY_METHOD = "POST";
 
         private HttpServletRequest servletRequest;
         private List<String> methodList;
         private FormHttpMessageConverter converter;
+        private boolean isMock;                         // spring-mvc mock
 
         private Builder() {
         }
@@ -157,6 +157,11 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
             return this;
         }
 
+        public Builder mock(boolean isMock) {
+            this.isMock = isMock;
+            return this;
+        }
+
         public HttpServletRequest build() throws IOException {
             String method = servletRequest.getMethod();
 
@@ -173,6 +178,9 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
         @Nullable
         private MultiValueMap<String, String> parseIfNecessary(HttpServletRequest request) throws IOException {
+            if (isMock) {
+                return null;
+            }
             if (!shouldParse(request)) {
                 return null;
             }
@@ -187,7 +195,7 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
         }
 
         private boolean shouldParse(HttpServletRequest request) {
-            if (!parseFormBodyMethod.equals(request.getMethod())) {
+            if (!PARSE_FORM_BODY_METHOD.equals(request.getMethod())) {
                 return false;
             }
             try {

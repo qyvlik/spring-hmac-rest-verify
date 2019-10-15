@@ -63,6 +63,7 @@ public class HmacSignatureBuilder {
     }
 
     public HmacSignatureBuilder method(String method) {
+        // todo check method
         this.plainText.setMethod(method);
         return this;
     }
