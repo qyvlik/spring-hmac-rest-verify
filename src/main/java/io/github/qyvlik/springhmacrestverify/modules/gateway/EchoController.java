@@ -55,7 +55,7 @@ public class EchoController {
             value = "api/v1/post-json",
             consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
             produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseObject<String> echoPostJSON(@RequestBody PostRequest postRequest, String param3) {
+    public ResponseObject<String> echoPostJSON(HttpServletRequest request, @RequestBody PostRequest postRequest, String param3) {
         return new ResponseObject<>("param1: " + postRequest.getParam1()
                 + ", param2: " + postRequest.getParam2() + ", param3: " + param3);
     }

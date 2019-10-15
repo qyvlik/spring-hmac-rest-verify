@@ -47,11 +47,17 @@ public class HmacVerifyBeanConfig {
     @Bean
     public HmacInterceptor hmacInterceptor(
             @Autowired @Qualifier("credentialsProvider") CredentialsProvider credentialsProvider) {
-        return new HmacInterceptor(
-                credentialsProvider,
-                hmacVerifyProperties.getHeader().getNonce(),
-                hmacVerifyProperties.getHeader().getAccessKey(),
-                hmacVerifyProperties.getHeader().getAuthorization()
-        );
+
+        HmacInterceptor.Config config = HmacInterceptor.ConfigBuilder.create()
+                .provider(credentialsProvider)
+                .headerOfAccessKey(hmacVerifyProperties.getHeader().getAccessKey())
+                .headerOfAuthorization(hmacVerifyProperties.getHeader().getAuthorization())
+                .headerOfNonce(hmacVerifyProperties.getHeader().getNonce())
+                .serverScheme(hmacVerifyProperties.getServer().getScheme())
+                .serverHost(hmacVerifyProperties.getServer().getHost())
+                .serverPort(hmacVerifyProperties.getServer().getPort())
+                .builder();
+
+        return new HmacInterceptor(config);
     }
 }

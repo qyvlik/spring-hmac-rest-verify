@@ -127,7 +127,7 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
     public static class Builder {
 
-        private static final String parseBodyMethod = "POST";
+        private static final String parseFormBodyMethod = "POST";
 
         private HttpServletRequest servletRequest;
         private List<String> methodList;
@@ -186,7 +186,7 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
         }
 
         private boolean shouldParse(HttpServletRequest request) {
-            if (!parseBodyMethod.equals(request.getMethod())) {
+            if (!parseFormBodyMethod.equals(request.getMethod())) {
                 return false;
             }
             try {

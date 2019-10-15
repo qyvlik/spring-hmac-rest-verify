@@ -2,9 +2,13 @@
 
 spring-hmac-rest-verify
 
+Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**"", support Content-Type: **application/x-www-form-urlencoded**, **application/json**
+
 ## same code
 
 [kpavlov/spring-hmac-rest](https://github.com/kpavlov/spring-hmac-rest)
+
+## ref
 
 [spring boot 学习笔记(5) 解决HttpServletRequest inputStream只能读取一次的问题](https://my.oschina.net/serge/blog/1094063)
 

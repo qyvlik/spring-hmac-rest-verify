@@ -23,9 +23,12 @@ import java.util.Map;
 
 public class HmacInterceptor implements HandlerInterceptor {
 
-    public static final List<String> notSupportMethodList =
+    public static final List<String> notSupportMethods =
             ImmutableList.<String>builder().add("CONNECT", "OPTIONS", "TRACE", "PATCH").build();
+    public static final List<String> supportMethods =
+            ImmutableList.<String>builder().add("GET", "HEAD", "POST", "PUT", "DELETE").build();
 
+    public static final String UTF8 = "UTF-8";
     public static final Map<String, String> algorithmMap =
             ImmutableMap.<String, String>builder()
                     .put("HmacSHA256".toLowerCase(), "HmacSHA256")
@@ -33,19 +36,10 @@ public class HmacInterceptor implements HandlerInterceptor {
                     .build();
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    private CredentialsProvider credentialsProvider;
-    private String nonceHeaderName;
-    private String accessKeyHeaderName;
-    private String authorizationHeaderName;
+    private Config config;
 
-    public HmacInterceptor(CredentialsProvider credentialsProvider,
-                           String nonceHeaderName,
-                           String accessKeyHeaderName,
-                           String authorizationHeaderName) {
-        this.credentialsProvider = credentialsProvider;
-        this.nonceHeaderName = nonceHeaderName;
-        this.accessKeyHeaderName = accessKeyHeaderName;
-        this.authorizationHeaderName = authorizationHeaderName;
+    public HmacInterceptor(Config config) {
+        this.config = config;
     }
 
     public boolean preHandle(HttpServletRequest request,
@@ -53,7 +47,7 @@ public class HmacInterceptor implements HandlerInterceptor {
                              Object handler) throws Exception {
 
         String httpMethod = request.getMethod();
-        if (notSupportMethodList.contains(httpMethod)) {
+        if (!supportMethods.contains(httpMethod)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20405, request.getRequestURI() + " not support http method : " + httpMethod);
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 405);
@@ -62,26 +56,26 @@ public class HmacInterceptor implements HandlerInterceptor {
 
         // todo check content-type
 
-        String accessKey = request.getHeader(accessKeyHeaderName);
+        String accessKey = request.getHeader(config.getHeaderOfAccessKey());
         if (StringUtils.isBlank(accessKey)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " need " + accessKeyHeaderName + " header");
+                    20401, request.getRequestURI() + " need " + config.getHeaderOfAccessKey() + " header");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
 
-        String authorization = request.getHeader(authorizationHeaderName);
+        String authorization = request.getHeader(config.getHeaderOfAuthorization());
         if (StringUtils.isBlank(authorization)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " need " + authorizationHeaderName + " header");
+                    20401, request.getRequestURI() + " need " + config.getHeaderOfAuthorization() + " header");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
 
-        String nonce = request.getHeader(nonceHeaderName);
+        String nonce = request.getHeader(config.getHeaderOfNonce());
         if (StringUtils.isBlank(nonce)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20400, request.getRequestURI() + " need " + nonceHeaderName + " header");
+                    20400, request.getRequestURI() + " need " + config.getHeaderOfNonce() + " header");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 400);
             return false;
         }
@@ -104,8 +98,16 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        HmacSignatureBuilder builder =
-                HmacSignatureHelper.getBuilderFromRequest(cachingRequestWrapper, nonce);
+        HmacSignatureHelper helper = HmacSignatureHelper.Builder.create()
+                .encoding(UTF8)
+                .request(cachingRequestWrapper)
+                .serverHost(null)
+                .serverPort(null)
+                .serverScheme(null)
+                .build();
+
+        HmacSignatureBuilder builder = helper.createHmacSignatureBuilder(nonce);
+
         if (builder == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " get hmac signature builder from request failure");
@@ -113,10 +115,10 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        CredentialsProvider.Credential credential = credentialsProvider.getCredential(accessKey);
+        CredentialsProvider.Credential credential = config.getProvider().getCredential(accessKey);
         if (credential == null || StringUtils.isBlank(credential.getSecretKey())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " header " + accessKeyHeaderName + " value is invalidate");
+                    20401, request.getRequestURI() + " header " + config.getHeaderOfAccessKey() + " value is invalidate");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
@@ -124,28 +126,28 @@ public class HmacInterceptor implements HandlerInterceptor {
         AuthHeader authHeader = AuthHeader.parse(authorization);
         if (authHeader == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate");
+                    20401, request.getRequestURI() + " header " + config.getHeaderOfAuthorization() + " value is invalidate");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
 
         if (StringUtils.isBlank(authHeader.getAlgorithm())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate, lost algorithm");
+                    20401, request.getRequestURI() + " header " + config.getHeaderOfAuthorization() + " value is invalidate, lost algorithm");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
 
         if (!algorithmMap.containsKey(authHeader.getAlgorithm().toLowerCase())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate, algorithm: " + authHeader.getAlgorithm() + " not support");
+                    20401, request.getRequestURI() + " header " + config.getHeaderOfAuthorization() + " value is invalidate, algorithm: " + authHeader.getAlgorithm() + " not support");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
 
         if (StringUtils.isBlank(authHeader.getSignature())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
-                    20401, request.getRequestURI() + " header " + authorizationHeaderName + " value is invalidate, lost signature");
+                    20401, request.getRequestURI() + " header " + config.getHeaderOfAuthorization() + " value is invalidate, lost signature");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 401);
             return false;
         }
@@ -172,5 +174,122 @@ public class HmacInterceptor implements HandlerInterceptor {
         }
 
         return true;
+    }
+
+    public static class Config {
+        private CredentialsProvider provider;
+        private String headerOfNonce;
+        private String headerOfAccessKey;
+        private String headerOfAuthorization;
+        private String serverScheme;
+        private String serverHost;
+        private Integer serverPort;
+
+        public CredentialsProvider getProvider() {
+            return provider;
+        }
+
+        public void setProvider(CredentialsProvider provider) {
+            this.provider = provider;
+        }
+
+        public String getHeaderOfNonce() {
+            return headerOfNonce;
+        }
+
+        public void setHeaderOfNonce(String headerOfNonce) {
+            this.headerOfNonce = headerOfNonce;
+        }
+
+        public String getHeaderOfAccessKey() {
+            return headerOfAccessKey;
+        }
+
+        public void setHeaderOfAccessKey(String headerOfAccessKey) {
+            this.headerOfAccessKey = headerOfAccessKey;
+        }
+
+        public String getHeaderOfAuthorization() {
+            return headerOfAuthorization;
+        }
+
+        public void setHeaderOfAuthorization(String headerOfAuthorization) {
+            this.headerOfAuthorization = headerOfAuthorization;
+        }
+
+        public String getServerScheme() {
+            return serverScheme;
+        }
+
+        public void setServerScheme(String serverScheme) {
+            this.serverScheme = serverScheme;
+        }
+
+        public String getServerHost() {
+            return serverHost;
+        }
+
+        public void setServerHost(String serverHost) {
+            this.serverHost = serverHost;
+        }
+
+        public Integer getServerPort() {
+            return serverPort;
+        }
+
+        public void setServerPort(Integer serverPort) {
+            this.serverPort = serverPort;
+        }
+    }
+
+    public static class ConfigBuilder {
+        private Config config;
+
+        private ConfigBuilder() {
+            this.config = new Config();
+        }
+
+        public static ConfigBuilder create() {
+            return new ConfigBuilder();
+        }
+
+        public ConfigBuilder provider(CredentialsProvider provider) {
+            this.config.provider = provider;
+            return this;
+        }
+
+        public ConfigBuilder headerOfNonce(String headerOfNonce) {
+            this.config.headerOfNonce = headerOfNonce;
+            return this;
+        }
+
+        public ConfigBuilder headerOfAccessKey(String headerOfAccessKey) {
+            this.config.headerOfAccessKey = headerOfAccessKey;
+            return this;
+        }
+
+        public ConfigBuilder headerOfAuthorization(String headerOfAuthorization) {
+            this.config.headerOfAuthorization = headerOfAuthorization;
+            return this;
+        }
+
+        public ConfigBuilder serverScheme(String serverScheme) {
+            this.config.serverScheme = serverScheme;
+            return this;
+        }
+
+        public ConfigBuilder serverHost(String serverHost) {
+            this.config.serverHost = serverHost;
+            return this;
+        }
+
+        public ConfigBuilder serverPort(Integer serverPort) {
+            this.config.serverPort = serverPort;
+            return this;
+        }
+
+        public Config builder() {
+            return this.config;
+        }
     }
 }
