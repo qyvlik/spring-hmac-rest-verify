@@ -227,7 +227,7 @@ public class SpringHmacRestVerifyApplicationTests {
     }
 
     @Test
-    public void test004_put_chinese_with_form_type() throws Exception {
+    public void test005_put_chinese_with_form_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
@@ -275,7 +275,7 @@ public class SpringHmacRestVerifyApplicationTests {
     }
 
     @Test
-    public void test004_delete_chinese_with_form_type() throws Exception {
+    public void test006_delete_chinese_with_form_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
@@ -323,7 +323,7 @@ public class SpringHmacRestVerifyApplicationTests {
     }
 
     @Test
-    public void test005_post_chinese2_with_form_type() throws Exception {
+    public void test007_post_chinese2_with_form_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
@@ -372,7 +372,7 @@ public class SpringHmacRestVerifyApplicationTests {
 
 
     @Test
-    public void test006_post_chinese_with_json_type() throws Exception {
+    public void test008_post_chinese_with_json_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
@@ -420,7 +420,7 @@ public class SpringHmacRestVerifyApplicationTests {
     }
 
     @Test
-    public void test007_delete_chinese_with_json_type() throws Exception {
+    public void test009_delete_chinese_with_json_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
@@ -469,7 +469,7 @@ public class SpringHmacRestVerifyApplicationTests {
 
 
     @Test
-    public void test008_put_chinese_with_json_type() throws Exception {
+    public void test010_put_chinese_with_json_type() throws Exception {
         String accessKey = properties.getAccessKey();
         String secretKey = properties.getSecretKey();
 
