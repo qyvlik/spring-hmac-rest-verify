@@ -12,7 +12,7 @@ public class CachingRequestFilter implements Filter {
 
     // support method: GET, HEAD, POST, PUT, DELETE
     // not support method: CONNECT, PATCH, OPTIONS, TRACE
-    private static final List<String> notSupportMethodList =
+    private static final List<String> notSupportMethos =
             ImmutableList.<String>builder().add("CONNECT", "OPTIONS", "TRACE", "PATCH").build();
 
     private static final List<String> supportMethods =
@@ -26,7 +26,6 @@ public class CachingRequestFilter implements Filter {
         filter.mock = true;
         return filter;
     }
-
 
     @Override
     public void doFilter(ServletRequest servletRequest,
