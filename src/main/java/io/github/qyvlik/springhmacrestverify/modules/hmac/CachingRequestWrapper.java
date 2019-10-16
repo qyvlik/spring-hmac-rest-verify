@@ -178,6 +178,7 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
         @Nullable
         private MultiValueMap<String, String> parseIfNecessary(HttpServletRequest request) throws IOException {
+            // if is spring-boot mvc mock, don't parse payload
             if (isMock) {
                 return null;
             }

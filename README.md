@@ -2,7 +2,7 @@
 
 spring-hmac-rest-verify
 
-Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**"", support Content-Type: **application/x-www-form-urlencoded**, **application/json**
+Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**, support Content-Type: **application/x-www-form-urlencoded**, **application/json**
 
 ## same code
 
@@ -20,11 +20,11 @@ Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**"", support
 
 [HTTP 请求方法](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods)
 
-    - [http PATCH](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/PATCH)
-    
-    - [http PUT](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/PUT)
-    
-    - [http POST](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/POST)
+- [http PATCH](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/PATCH)
+
+- [http PUT](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/PUT)
+
+- [http POST](https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Methods/POST)
     
 [HTTP请求方法：GET、HEAD、POST、PUT、DELETE、CONNECT、OPTIONS、TRACE](https://itbilu.com/other/relate/EkwKysXIl.html)
 
