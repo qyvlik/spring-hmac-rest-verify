@@ -1,6 +1,6 @@
 # spring-hmac-rest-verify
 
-spring-hmac-rest-verify
+Another spring HMAC authentication filter for RESTfull webservice example.
 
 Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**, support Content-Type: **application/x-www-form-urlencoded**, **application/json**
 
