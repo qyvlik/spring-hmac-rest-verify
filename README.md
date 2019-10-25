@@ -4,6 +4,93 @@ spring-hmac-rest-verify
 
 Support http method: **GET**, **HEAD**, **POST**, **PUT**, **DELETE**, support Content-Type: **application/x-www-form-urlencoded**, **application/json**
 
+You can define the `NONCE`, `ACCESS-KEY`, `AUTHORIZATION` header as follow, also can define the `server.scheme`, `server.host`, `server.port`.
+
+```yaml
+hmac-verify:
+  header:
+    nonce: nonce
+    access-key: accesskey
+    authorization: authorization
+  server:
+    scheme: http
+    host: localhost
+    port: 8080
+```
+
+Both client and server digest of the following string:
+
+```text
+METHOD\n
+SCHEME\n
+HOST\n
+PORT\n
+PATH\n
+QUERY\n
+CONTENT-TYPE\n
+PAYLOAD\n
+NONCE
+```
+
+- `METHOD`: http method, such as **GET**, **POST**
+- `SCHEME`: http or https
+- `HOST`: `localhost` or other domain name.
+- `PORT`: http port
+- `PATH`: http uri
+- `QUERY`: http query string
+- `CONTENT-TYPE`: content-type, support **application/x-www-form-urlencoded** or **application/json**
+- `PAYLOAD`: form format or json format
+- `NONCE`: nonce
+
+## main code
+
+See the package `io.github.qyvlik.springhmacrestverify.modules.hmac` 
+and `io.github.qyvlik.springhmacrestverify.modules.verify`.
+
+- `CachingRequestFilter` : read the payload from request, so you don't need sorting the form-data.
+- `HmacSignatureHelper`: build hmac signature from `HttpServletRequestWrapper`.
+- `HmacInterceptor`: verify the client signature
+
+## example
+
+### server side
+
+See the package `io.github.qyvlik.springhmacrestverify.modules.verify`.
+
+- `HmacInterceptor`: verify the client signature, you can consult it for you own server.
+- `CredentialsProviderMapImpl`: simple provider for access-key, secret-key.
+
+### client side by okhttp
+
+```yaml
+String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
+String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
+Request request = HmacRequestBuilder.create()
+        .method("GET")
+        .url(HttpUrl.parse("http://localhost:8080/api/v1/time"))
+        .contentType("application/x-www-form-urlencoded")
+        .body(null)
+        .charset(Charset.forName("UTF-8"))
+        .headerOfAccessKey("accessKey")
+        .headerOfAuthorization("Authorization")
+        .headerOfNonce("nonce")
+        .build(accessKey, secretKey, "HmacSHA256");
+
+OkHttpClient okHttpClient = new OkHttpClient();
+Call call = okHttpClient.newCall(request);
+
+Response response = call.execute();
+
+Assert.assertNotNull(response);
+Assert.assertNotNull(response.body());
+```
+
+See the more examples in [HmacRequestBuilderTest.java](src/test/java/io/github/qyvlik/springhmacrestverify/modules/client/HmacRequestBuilderTest.java).
+
+### test case
+
+See more test cases in [SpringHmacRestVerifyApplicationTests.java](src/test/java/io/github/qyvlik/springhmacrestverify/SpringHmacRestVerifyApplicationTests.java).
+
 ## same code
 
 [kpavlov/spring-hmac-rest](https://github.com/kpavlov/spring-hmac-rest)
