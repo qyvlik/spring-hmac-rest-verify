@@ -1,17 +1,15 @@
 package io.github.qyvlik.springhmacrestverify.modules.gateway;
 
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
+import io.github.qyvlik.springhmacrestverify.modules.gateway.request.ComplexJsonReq;
 import io.github.qyvlik.springhmacrestverify.modules.gateway.request.PostRequest;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
 @RestController
-public class EchoController {
+public class ApiController {
 
     @RequestMapping(
             method = RequestMethod.POST,
@@ -78,5 +76,14 @@ public class EchoController {
     public ResponseObject<String> echoPutJSON(@RequestBody PostRequest postRequest, String param3) {
         return new ResponseObject<>("param1: " + postRequest.getParam1()
                 + ", param2: " + postRequest.getParam2() + ", param3: " + param3);
+    }
+
+    @PostMapping(
+            value = "api/v1/post-json-2",
+            consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+            produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+    public ResponseObject<String> echoPutJSON(@RequestBody ComplexJsonReq postRequest, String param3) {
+        return new ResponseObject<>("param1: " + postRequest.getParam1()
+                + ", list: " + postRequest.getList() + ", param3: " + param3);
     }
 }

@@ -1,6 +1,8 @@
 package io.github.qyvlik.springhmacrestverify.modules.client;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.google.common.collect.Lists;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
@@ -300,6 +302,39 @@ public class HmacRequestTest {
         Assert.assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3中文";
+
+        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+    }
+
+    @Test
+    public void test011_post_chinese_with_json_type() throws Exception {
+        JSONObject req = new JSONObject();
+        req.put("param1", "中文");
+        req.put("list", Lists.newArrayList("中文", "en"));
+
+        Request request = new Request.Builder()
+                .post(RequestBody.create(
+                        MediaType.parse("application/json"),
+                        req.toJSONString())
+                )
+                .url(HttpUrl.parse("http://localhost:8080/api/v1/post-json-2?param3=3中文"))
+                .addHeader("accessKey", accessKey)
+                .build();
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
+        Call call = okHttpClient.newCall(request);
+
+        Response response = call.execute();
+
+        Assert.assertNotNull(response);
+        Assert.assertNotNull(response.body());
+
+        ResponseObject responseObject = JSON.parseObject(response.body().string()).toJavaObject(ResponseObject.class);
+        Assert.assertNotNull(responseObject);
+        Assert.assertNull(responseObject.getError());
+
+        final String resultString = "param1: 中文, list: [中文, en], param3: 3中文";
 
         Assert.assertEquals(responseObject.getResult().toString(), resultString);
     }

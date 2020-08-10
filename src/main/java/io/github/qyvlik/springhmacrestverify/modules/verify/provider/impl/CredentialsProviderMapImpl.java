@@ -29,7 +29,7 @@ public class CredentialsProviderMapImpl implements CredentialsProvider {
         if (StringUtils.isBlank(secretKey)) {
             return null;
         }
-        return new CredentialImpl(accessKey, secretKey, new NonceCheckerForExpress(expire));
+        return new CredentialImpl(accessKey, secretKey, new NonceCheckerForExpire(expire));
     }
 
     @AllArgsConstructor
@@ -42,7 +42,7 @@ public class CredentialsProviderMapImpl implements CredentialsProvider {
 
     @Slf4j
     @AllArgsConstructor
-    public static class NonceCheckerForExpress implements NonceChecker {
+    public static class NonceCheckerForExpire implements NonceChecker {
         private Integer expire;
 
         @Override
