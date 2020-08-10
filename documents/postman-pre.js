@@ -1,0 +1,64 @@
+/**
+ * @param host not include port
+ */
+const accessKeyEnv = 'AccessKey';
+const secretKeyEnv = 'SecretKey';
+const hostEnv = 'HmacHost';
+const nonceEnv = '$timestamp';
+const algorithm = 'HmacSHA256';
+
+/**
+ *
+ * @param method
+ * @param protocol
+ * @param host          not include port
+ * @param path
+ * @param query         blank not include `?`
+ * @param content_type
+ * @param body
+ * @param nonce
+ * @param accessKey
+ * @param secretKey
+ * @returns {*|string}
+ */
+function signature({method, protocol, host, path, query, content_type, body, nonce}, {accessKey, secretKey}) {
+    const plainText =
+        method + '\n'
+        + protocol + '\n'
+        + host + '\n'
+        + path + '\n'
+        + query + '\n'
+        + content_type + '\n'
+        + body + '\n'
+        + nonce;
+    const signatureBytes = CryptoJS.HmacSHA256(plainText, secretKey);
+    const signatureBase64 = CryptoJS.enc.Base64.stringify(signatureBytes);
+    const sign = {
+        plainText,
+        signature: signatureBase64
+    };
+    console.info(`sign:${JSON.stringify(sign)}`);
+    return signatureBase64;
+}
+
+const method = pm.request.method;
+const protocol = pm.request.url.protocol;
+const path = '/' + pm.request.url.path.join('/');
+const query = pm.request.url.query.count() !== 0 ? ('?' + pm.request.url.query) : pm.request.url.query;
+const content_type = pm.request.headers.get('Content-Type') || '';
+// host not include port
+const host = (pm.environment.get(hostEnv) || '').split(":")[0];
+const nonce = pm.environment.get(nonceEnv) || '';
+const body = pm.request.body || '';
+const accessKey = pm.variables.get(accessKeyEnv) || '';
+const secretKey = pm.variables.get(secretKeyEnv) || '';
+
+const signatureStr = signature(
+    {method, protocol, host, path, query, content_type, body, nonce},
+    {accessKey, secretKey}
+);
+const authorization = algorithm + ": " + signatureStr;
+
+// 设置签名和 Nonce
+pm.request.headers.upsert({key: 'Authorization', value: authorization});
+pm.request.headers.upsert({key: 'Nonce', value: nonce});
