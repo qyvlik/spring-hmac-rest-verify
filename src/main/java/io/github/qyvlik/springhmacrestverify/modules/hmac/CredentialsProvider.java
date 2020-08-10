@@ -3,7 +3,7 @@ package io.github.qyvlik.springhmacrestverify.modules.hmac;
 /**
  * HMAC ak sk provider
  */
-public interface HmacCredentialsProvider {
+public interface CredentialsProvider {
 
     Credential getCredential(String accessKey);
 
@@ -12,5 +12,11 @@ public interface HmacCredentialsProvider {
         String getAccessKey();
 
         String getSecretKey();
+
+        NonceChecker getNonceChecker();
+    }
+
+    interface NonceChecker {
+        boolean check(String nonce);
     }
 }

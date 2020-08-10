@@ -3,7 +3,6 @@ package io.github.qyvlik.springhmacrestverify.modules.hmac;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -85,15 +84,6 @@ public class HmacHelper {
         byte[] content = getRequest().getContentAsByteArray();
         if (content != null && content.length > 0) {
             body = new String(content);
-        }
-        MediaType mediaType = MediaType.parseMediaType(getRequest().getContentType());
-        if (StringUtils.isNotBlank(body)
-                && URL_DECODE_METHOD.equalsIgnoreCase(getRequest().getMethod())
-                && MediaType.APPLICATION_FORM_URLENCODED.includes(mediaType)) {
-
-            // don't encoding
-            return body;
-//            return URLDecoder.decode(body, getEncoding());
         }
         return body;
     }

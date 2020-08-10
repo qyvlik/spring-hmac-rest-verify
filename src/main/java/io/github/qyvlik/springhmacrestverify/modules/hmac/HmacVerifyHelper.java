@@ -28,8 +28,8 @@ public class HmacVerifyHelper {
                     .put("HmacSHA512".toLowerCase(), "HmacSHA512")
                     .build();
 
-    public static VerifyResponse verify(HttpServletRequest request,
-                                        HmacConfig config) {
+    public static VerifyResult verify(HttpServletRequest request,
+                                      HmacConfig config) {
         String httpMethod = request.getMethod();
         if (!supportMethods.contains(httpMethod)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
@@ -90,7 +90,7 @@ public class HmacVerifyHelper {
             return fail(500, responseObject);
         }
 
-        HmacCredentialsProvider.Credential credential = config.getProvider().getCredential(accessKey);
+        CredentialsProvider.Credential credential = config.getProvider().getCredential(accessKey);
         if (credential == null || StringUtils.isBlank(credential.getSecretKey())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20401, request.getRequestURI() + " header "
@@ -151,11 +151,18 @@ public class HmacVerifyHelper {
             return fail(500, responseObject);
         }
 
-        return VerifyResponse.ok();
+        // check nonce
+        if (credential.getNonceChecker() != null && !credential.getNonceChecker().check(nonce)) {
+            ResponseObject<String> responseObject = new ResponseObject<>(
+                    20500, request.getRequestURI() + " check nonce failure");
+            return fail(401, responseObject);
+        }
+
+        return VerifyResult.ok();
     }
 
-    private static VerifyResponse fail(int httpStatus, ResponseObject<String> responseObject) {
-        return VerifyResponse
+    private static VerifyResult fail(int httpStatus, ResponseObject<String> responseObject) {
+        return VerifyResult
                 .builder()
                 .success(false)
                 .httpStatus(httpStatus)
@@ -166,7 +173,7 @@ public class HmacVerifyHelper {
 
     @Data
     @Builder
-    public static class VerifyResponse {
+    public static class VerifyResult {
         /**
          * verify is success
          */
@@ -187,8 +194,8 @@ public class HmacVerifyHelper {
         private String body;
 
 
-        public static VerifyResponse ok() {
-            return VerifyResponse.builder().success(true).build();
+        public static VerifyResult ok() {
+            return VerifyResult.builder().success(true).build();
         }
     }
 

@@ -20,7 +20,7 @@ public class HmacInterceptor implements HandlerInterceptor {
                              HttpServletResponse response,
                              Object handler) throws Exception {
 
-        HmacVerifyHelper.VerifyResponse verifyResult = HmacVerifyHelper.verify(request, config);
+        HmacVerifyHelper.VerifyResult verifyResult = HmacVerifyHelper.verify(request, config);
         if (verifyResult.getSuccess()) {
             return true;
         }
