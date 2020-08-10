@@ -1,6 +1,7 @@
 package io.github.qyvlik.springhmacrestverify.modules.client;
 
 import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignatureBuilder;
+import lombok.Data;
 import okhttp3.Headers;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+@Data
 public class HmacRequestBuilder {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

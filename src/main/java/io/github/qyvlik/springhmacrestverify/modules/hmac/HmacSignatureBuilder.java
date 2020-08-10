@@ -5,10 +5,12 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.validation.constraints.DecimalMin;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 
+@Deprecated
 public class HmacSignatureBuilder {
 
     public static final String DELIMITER = "\n";

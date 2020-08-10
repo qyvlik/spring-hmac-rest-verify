@@ -1,46 +1,44 @@
 package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
+import lombok.Builder;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 
-@Deprecated
-public class HmacSignatureHelper {
-
+@Slf4j
+@Builder
+public class HmacHelper {
     private static final String URL_DECODE_METHOD = "POST";
-    private final Logger logger = LoggerFactory.getLogger(HmacSignatureHelper.class);
     private CachingRequestWrapper request;
     private String serverScheme;
     private String serverHost;
     private Integer serverPort;
     private String encoding;
 
-    private HmacSignatureHelper() {
-
-    }
-
-    public HmacSignatureBuilder createHmacSignatureBuilder(String nonce) {
+    public HmacSignature createHmacSignatureBuilder(String nonce) {
         try {
-            HmacSignatureBuilder builder = HmacSignatureBuilder.create();
 
-            builder.method(getRequest().getMethod())
+            PlainText plainText = PlainText.builder()
+                    .method(getRequest().getMethod())
                     .scheme(getServerScheme())
                     .host(getServerHost())
-                    .port(getServerPort())
                     .contentType(getRequest().getContentType() == null ? "" : getRequest().getContentType())
                     .path(getRequest().getRequestURI())
                     .query(getQueryString())
                     .body(getBody())
-                    .nonce(nonce);
+                    .nonce(nonce)
+                    .build();
 
-            return builder;
+            return HmacSignature.builder()
+                    .plainText(plainText)
+                    .build()
+                    ;
         } catch (IOException e) {
-            logger.error("createBuilderFromRequest failure :{}", e.getMessage());
+            log.error("createBuilderFromRequest failure :{}", e.getMessage());
         }
         return null;
     }
@@ -97,46 +95,5 @@ public class HmacSignatureHelper {
             return URLDecoder.decode(body, getEncoding());
         }
         return body;
-    }
-
-    public static class Builder {
-        private HmacSignatureHelper helper;
-
-        private Builder() {
-            helper = new HmacSignatureHelper();
-        }
-
-        public static Builder create() {
-            return new Builder();
-        }
-
-        public Builder request(CachingRequestWrapper request) {
-            helper.request = request;
-            return this;
-        }
-
-        public Builder serverScheme(String serverScheme) {
-            helper.serverScheme = serverScheme;
-            return this;
-        }
-
-        public Builder serverHost(String serverHost) {
-            helper.serverHost = serverHost;
-            return this;
-        }
-
-        public Builder serverPort(Integer serverPort) {
-            helper.serverPort = serverPort;
-            return this;
-        }
-
-        public Builder encoding(String encoding) {
-            helper.encoding = encoding;
-            return this;
-        }
-
-        public HmacSignatureHelper build() {
-            return helper;
-        }
     }
 }

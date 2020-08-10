@@ -2,37 +2,38 @@ package io.github.qyvlik.springhmacrestverify.modules.client;
 
 import com.alibaba.fastjson.JSON;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import org.junit.Assert;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.Charset;
 
+@Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HmacRequestBuilderTest {
 
-    private String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
-    private String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
-    private Logger logger = LoggerFactory.getLogger(getClass());
+    final private String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
+    final private String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
+
+    private OkHTTPHMACInterceptor okHTTPHMACInterceptor =
+            new OkHTTPHMACInterceptor("HmacSHA256", secretKey);
 
     @Test
     public void test001_time_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("GET")
-                .url(HttpUrl.parse("http://localhost:8080/api/v1/time"))
-                .contentType("application/x-www-form-urlencoded")
-                .body(null)
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        Request request = new Request.Builder()
+                .get()
+                .url(HttpUrl.parse("http://localhost:8080/api/v1/time"))
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("accessKey", accessKey)
+                .addHeader("Nonce", System.currentTimeMillis() + "")
+                .build();
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -58,7 +59,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -80,7 +82,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -110,7 +113,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -140,7 +144,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -170,7 +175,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -200,7 +206,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -231,7 +238,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -261,7 +269,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();
@@ -291,7 +300,8 @@ public class HmacRequestBuilderTest {
                 .headerOfNonce("nonce")
                 .build(accessKey, secretKey, "HmacSHA256");
 
-        OkHttpClient okHttpClient = new OkHttpClient();
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(okHTTPHMACInterceptor).build();
         Call call = okHttpClient.newCall(request);
 
         Response response = call.execute();

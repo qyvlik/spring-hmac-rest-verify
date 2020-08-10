@@ -7,8 +7,8 @@ import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
 import io.github.qyvlik.springhmacrestverify.common.utils.ServletUtils;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.AuthHeader;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.CachingRequestWrapper;
-import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignatureBuilder;
-import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignatureHelper;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacHelper;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignature;
 import io.github.qyvlik.springhmacrestverify.modules.verify.provider.CredentialsProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -96,17 +96,16 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        HmacSignatureHelper helper = HmacSignatureHelper.Builder.create()
+        HmacSignature hmacSignature = HmacHelper.builder()
                 .encoding(UTF8)
                 .request(cachingRequestWrapper)
                 .serverScheme(config.getServerScheme())
                 .serverHost(config.getServerHost())
                 .serverPort(config.getServerPort())
-                .build();
+                .build()
+                .createHmacSignatureBuilder(nonce);
 
-        HmacSignatureBuilder builder = helper.createHmacSignatureBuilder(nonce);
-
-        if (builder == null) {
+        if (hmacSignature == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " get hmac signature builder from request failure");
             ServletUtils.writeJsonString(response, JSON.toJSONString(responseObject), 500);
@@ -150,9 +149,9 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String serverSignature = builder.signature(
-                credential.getSecretKey(),
-                algorithmMap.get(authHeader.getAlgorithm().toLowerCase()));
+        hmacSignature.setAlgorithm(algorithmMap.get(authHeader.getAlgorithm().toLowerCase()));
+        hmacSignature.setSecretKey(credential.getSecretKey());
+        String serverSignature = hmacSignature.signature();
 
         if (StringUtils.isBlank(serverSignature)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
@@ -162,7 +161,7 @@ public class HmacInterceptor implements HandlerInterceptor {
         }
 
         logger.debug("plainText:{}, serverSignature:{} clientSignature:{}",
-                builder.plaintext(), serverSignature, authHeader.getSignature());
+                hmacSignature.plaintext(), serverSignature, authHeader.getSignature());
 
         if (!serverSignature.equals(authHeader.getSignature())) {
             ResponseObject<String> responseObject = new ResponseObject<>(
