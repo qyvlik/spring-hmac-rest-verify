@@ -77,9 +77,9 @@ public class HmacHelper {
     }
 
     private String getQueryString() throws UnsupportedEncodingException {
-        return getRequest().getQueryString() == null
+        return StringUtils.isBlank(getRequest().getQueryString())
                 ? ""
-                : URLDecoder.decode(getRequest().getQueryString(), getEncoding());
+                : "?" + URLDecoder.decode(getRequest().getQueryString(), getEncoding());
     }
 
     private String getBody() throws IOException {
@@ -92,7 +92,10 @@ public class HmacHelper {
         if (StringUtils.isNotBlank(body)
                 && URL_DECODE_METHOD.equalsIgnoreCase(getRequest().getMethod())
                 && MediaType.APPLICATION_FORM_URLENCODED.includes(mediaType)) {
-            return URLDecoder.decode(body, getEncoding());
+
+            // don't encoding
+            return body;
+//            return URLDecoder.decode(body, getEncoding());
         }
         return body;
     }

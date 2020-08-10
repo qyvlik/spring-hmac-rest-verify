@@ -13,7 +13,7 @@ import java.nio.charset.Charset;
 
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-public class HmacRequestBuilderTest {
+public class HmacRequestTest {
 
     final private String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
     final private String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
@@ -29,7 +29,6 @@ public class HmacRequestBuilderTest {
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/time"))
                 .addHeader("Content-Type", "application/x-www-form-urlencoded")
                 .addHeader("accessKey", accessKey)
-                .addHeader("Nonce", System.currentTimeMillis() + "")
                 .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -48,16 +47,12 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test002_head_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("HEAD")
+        Request request = new Request.Builder()
+                .head()
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/time?k/1/1=1zzzdaw&zzz=111&zz&zz"))
-                .contentType("application/x-www-form-urlencoded")
-                .body(null)
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -71,16 +66,14 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test003_post_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("POST")
+        Request request = new Request.Builder()
+                .post(new FormBody.Builder()
+                        .add("param1", "1")
+                        .add("param2", "2")
+                        .build())
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/post-form?param3=3"))
-                .contentType("application/x-www-form-urlencoded")
-                .body("param1=1&param2=2")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -102,16 +95,15 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test004_post_chinese_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("POST")
+
+        Request request = new Request.Builder()
+                .post(new FormBody.Builder()
+                        .add("param1", "1")
+                        .add("param2", "2中文")
+                        .build())
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/post-form?param3=3"))
-                .contentType("application/x-www-form-urlencoded")
-                .body("param1=1&param2=2中文")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -133,16 +125,14 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test005_put_chinese_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("PUT")
+        Request request = new Request.Builder()
+                .put(new FormBody.Builder()
+                        .add("param1", "1")
+                        .add("param2", "2中文")
+                        .build())
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/put-form?param3=3"))
-                .contentType("application/x-www-form-urlencoded")
-                .body("param1=1&param2=2中文")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -164,16 +154,15 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test006_delete_chinese_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("DELETE")
+
+        Request request = new Request.Builder()
+                .delete(new FormBody.Builder()
+                        .add("param1", "1")
+                        .add("param2", "2中文")
+                        .build())
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/delete-form?param3=3"))
-                .contentType("application/x-www-form-urlencoded")
-                .body("param1=1&param2=2中文")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -195,16 +184,16 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test007_post_chinese2_with_form_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("POST")
+
+        Request request = new Request.Builder()
+                .post(new FormBody.Builder()
+                        .add("param1", "1")
+                        .add("param2", "2中文")
+                        .build())
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/post-form-2?param3=3中文"))
-                .contentType("application/x-www-form-urlencoded")
-                .body("param1=1&param2=2中文")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
+
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -227,16 +216,14 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test008_post_chinese_with_json_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("POST")
+        Request request = new Request.Builder()
+                .post(RequestBody.create(
+                        MediaType.parse("application/json"),
+                        "{\"param1\": \"1\",\"param2\": \"2中文\"}")
+                )
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/post-json?param3=3中文"))
-                .contentType("application/json;charset=UTF-8")
-                .body("{\"param1\": \"1\",\"param2\": \"2中文\"}")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -258,16 +245,16 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test009_delete_chinese_with_json_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("DELETE")
+
+        Request request = new Request.Builder()
+                .delete(RequestBody.create(
+                        MediaType.parse("application/json"),
+                        "{\"param1\": \"1\",\"param2\": \"2中文\"}")
+                )
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/delete-json?param3=3中文"))
-                .contentType("application/json;charset=UTF-8")
-                .body("{\"param1\": \"1\",\"param2\": \"2中文\"}")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
+
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();
@@ -289,16 +276,15 @@ public class HmacRequestBuilderTest {
 
     @Test
     public void test010_put_chinese_with_json_type() throws Exception {
-        Request request = HmacRequestBuilder.create()
-                .method("PUT")
+
+        Request request = new Request.Builder()
+                .put(RequestBody.create(
+                        MediaType.parse("application/json"),
+                        "{\"param1\": \"1\",\"param2\": \"2中文\"}")
+                )
                 .url(HttpUrl.parse("http://localhost:8080/api/v1/put-json?param3=3中文"))
-                .contentType("application/json;charset=UTF-8")
-                .body("{\"param1\": \"1\",\"param2\": \"2中文\"}")
-                .charset(Charset.forName("UTF-8"))
-                .headerOfAccessKey("accessKey")
-                .headerOfAuthorization("Authorization")
-                .headerOfNonce("nonce")
-                .build(accessKey, secretKey, "HmacSHA256");
+                .addHeader("accessKey", accessKey)
+                .build();
 
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(okHTTPHMACInterceptor).build();

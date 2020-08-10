@@ -3,6 +3,7 @@ package io.github.qyvlik.springhmacrestverify.modules.verify.interceptor;
 import com.alibaba.fastjson.JSON;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
 import io.github.qyvlik.springhmacrestverify.common.utils.ServletUtils;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.AuthHeader;
@@ -160,8 +161,12 @@ public class HmacInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        logger.debug("plainText:{}, serverSignature:{} clientSignature:{}",
-                hmacSignature.plaintext(), serverSignature, authHeader.getSignature());
+        Map<String, String> sign = Maps.newHashMap();
+        sign.put("plainText", hmacSignature.plaintext());
+        sign.put("signature", serverSignature);
+        sign.put("client", authHeader.getSignature());
+
+        logger.debug("sign:{}", JSON.toJSONString(sign));
 
         if (!serverSignature.equals(authHeader.getSignature())) {
             ResponseObject<String> responseObject = new ResponseObject<>(

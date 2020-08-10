@@ -12,6 +12,7 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 import okio.Buffer;
+import org.apache.commons.lang3.StringUtils;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -20,7 +21,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Base64;
 import java.util.Map;
-import java.util.Objects;
 
 @Slf4j
 @Data
@@ -54,10 +54,9 @@ public class OkHTTPHMACInterceptor implements Interceptor {
         final String scheme = request.url().scheme();
         final String host = request.url().host();
         final String path = request.url().encodedPath();
-        final String query = Objects.equals(request.url().query(), "") ? "" : "?" + request.url().query();
+        final String query = StringUtils.isBlank(request.url().query()) ? "" : "?" + request.url().query();
         final String contentType = getContentType(request);
         final String body = getRawContentFromBody(request.body());
-        log.info("body:{}", body);
         final String nonce = System.currentTimeMillis() + "";
         final String plainText = method + DELIMITER +
                 scheme + DELIMITER +
@@ -77,16 +76,21 @@ public class OkHTTPHMACInterceptor implements Interceptor {
         Map<String, String> sign = Maps.newHashMap();
         sign.put("plainText", plainText);
         sign.put("signature", signatureStr);
-        log.info("sign:{}", JSON.toJSONString(sign));
+        log.debug("sign:{}", JSON.toJSONString(sign));
         return request.newBuilder()
+                .removeHeader("Nonce")
+                .addHeader("Nonce", nonce)
+                .removeHeader("Authorization")
                 .addHeader("Authorization", authorization)
-                .addHeader("Nonce", nonce).build();
+                .build();
     }
 
     private String getRawContentFromBody(RequestBody body) throws IOException {
         if (body != null) {
             Buffer buffer = new Buffer();
             body.writeTo(buffer);
+
+
             return buffer.readString(Charsets.UTF_8);
         }
         return "";
