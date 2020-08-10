@@ -31,13 +31,9 @@ public class HmacSignature {
         return Base64.getEncoder().encodeToString(signatureBytes);
     }
 
-    public String plaintext() {
-        return plainText.toString();
-    }
-
     public String signature() {
         try {
-            return HmacSignature.signature(algorithm, plaintext(), secretKey);
+            return HmacSignature.signature(algorithm, plainText.toString(), secretKey);
         } catch (NoSuchAlgorithmException e) {
             log.error("signature failure no such algorithm:{}, error:{}", algorithm, e.getMessage());
         } catch (InvalidKeyException e) {

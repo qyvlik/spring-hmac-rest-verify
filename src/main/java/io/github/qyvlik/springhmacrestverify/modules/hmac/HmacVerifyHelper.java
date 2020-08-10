@@ -141,7 +141,7 @@ public class HmacVerifyHelper {
         }
 
         Map<String, String> sign = Maps.newHashMap();
-        sign.put("plainText", hmacSignature.plaintext());
+        sign.put("plainText", hmacSignature.getPlainText().toString());
         sign.put("signature", serverSignature);
         sign.put("client", clientSignature);
         log.debug("sign:{}", JSON.toJSONString(sign));
