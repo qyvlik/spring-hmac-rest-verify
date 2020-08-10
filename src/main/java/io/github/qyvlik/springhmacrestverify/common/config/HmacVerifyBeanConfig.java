@@ -48,15 +48,14 @@ public class HmacVerifyBeanConfig {
     public HmacInterceptor hmacInterceptor(
             @Autowired @Qualifier("credentialsProvider") CredentialsProvider credentialsProvider) {
 
-        HmacInterceptor.Config config = HmacInterceptor.ConfigBuilder.create()
+        HmacInterceptor.Config config = HmacInterceptor.Config.builder()
                 .provider(credentialsProvider)
                 .headerOfAccessKey(hmacVerifyProperties.getHeader().getAccessKey())
                 .headerOfAuthorization(hmacVerifyProperties.getHeader().getAuthorization())
                 .headerOfNonce(hmacVerifyProperties.getHeader().getNonce())
                 .serverScheme(hmacVerifyProperties.getServer().getScheme())
                 .serverHost(hmacVerifyProperties.getServer().getHost())
-                .serverPort(hmacVerifyProperties.getServer().getPort())
-                .builder();
+                .build();
 
         return new HmacInterceptor(config);
     }

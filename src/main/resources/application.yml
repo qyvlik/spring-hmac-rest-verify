@@ -16,10 +16,10 @@ hmac-verify:
   server:
     scheme: http
     host: localhost
-    port: 8080
 
   access-key: f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0
   secret-key: f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0
+
 logging:
   level:
     io:

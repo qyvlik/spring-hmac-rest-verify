@@ -16,7 +16,6 @@ public class HmacHelper {
     private CachingRequestWrapper request;
     private String serverScheme;
     private String serverHost;
-    private Integer serverPort;
     private String encoding;
 
     public HmacSignature createHmacSignatureBuilder(String nonce) {
@@ -63,13 +62,6 @@ public class HmacHelper {
             host = host.replaceAll(":" + getRequest().getServerPort(), "");
         }
         return host;
-    }
-
-    private Integer getServerPort() {
-        if (this.serverPort != null) {
-            return this.serverPort;
-        }
-        return getRequest().getServerPort();
     }
 
     private String getEncoding() {

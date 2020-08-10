@@ -1,5 +1,9 @@
 package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -126,7 +130,12 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
         }
     }
 
-    public static class Builder {
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class WrapperBuilder {
 
         private static final String PARSE_FORM_BODY_METHOD = "POST";
 
@@ -134,33 +143,6 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
         private List<String> methodList;
         private FormHttpMessageConverter converter;
         private boolean isMock;                         // spring-mvc mock
-
-        private Builder() {
-        }
-
-        public static Builder create() {
-            return new Builder();
-        }
-
-        public Builder request(ServletRequest request) {
-            this.servletRequest = (HttpServletRequest) request;
-            return this;
-        }
-
-        public Builder methods(List<String> methodList) {
-            this.methodList = methodList;
-            return this;
-        }
-
-        public Builder convert(FormHttpMessageConverter converter) {
-            this.converter = converter;
-            return this;
-        }
-
-        public Builder mock(boolean isMock) {
-            this.isMock = isMock;
-            return this;
-        }
 
         public HttpServletRequest build() throws IOException {
             String method = servletRequest.getMethod();

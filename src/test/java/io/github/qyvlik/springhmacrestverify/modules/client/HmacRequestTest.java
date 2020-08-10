@@ -9,8 +9,6 @@ import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runners.MethodSorters;
 
-import java.nio.charset.Charset;
-
 @Slf4j
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class HmacRequestTest {

@@ -5,16 +5,13 @@ import org.springframework.http.converter.FormHttpMessageConverter;
 import org.springframework.http.converter.support.AllEncompassingFormHttpMessageConverter;
 
 import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
 public class CachingRequestFilter implements Filter {
 
     // support method: GET, HEAD, POST, PUT, DELETE
-    // not support method: CONNECT, PATCH, OPTIONS, TRACE
-    private static final List<String> notSupportMethos =
-            ImmutableList.<String>builder().add("CONNECT", "OPTIONS", "TRACE", "PATCH").build();
-
     private static final List<String> supportMethods =
             ImmutableList.<String>builder().add("GET", "HEAD", "POST", "PUT", "DELETE").build();
 
@@ -35,12 +32,14 @@ public class CachingRequestFilter implements Filter {
 
         if (!(servletRequest instanceof CachingRequestWrapper)) {
 
-            ServletRequest requestWrapper = CachingRequestWrapper.Builder.create()
-                    .request(servletRequest)
-                    .convert(formConverter)
-                    .methods(supportMethods)
-                    .mock(mock)
+            ServletRequest requestWrapper = CachingRequestWrapper.WrapperBuilder.builder()
+                    .servletRequest((HttpServletRequest) servletRequest)
+                    .converter(formConverter)
+                    .methodList(supportMethods)
+                    .isMock(mock)
+                    .build()
                     .build();
+
 
             filterChain.doFilter(requestWrapper, servletResponse);
             return;

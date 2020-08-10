@@ -24,7 +24,6 @@ Both client and server digest of the following string:
 METHOD\n
 SCHEME\n
 HOST\n
-PORT\n
 PATH\n
 QUERY\n
 CONTENT-TYPE\n
@@ -35,7 +34,6 @@ NONCE
 - `METHOD`: http method, such as **GET**, **POST**
 - `SCHEME`: http or https
 - `HOST`: `localhost` or other domain name.
-- `PORT`: http port
 - `PATH`: http uri
 - `QUERY`: http query string
 - `CONTENT-TYPE`: content-type, support **application/x-www-form-urlencoded** or **application/json**

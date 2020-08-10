@@ -4,7 +4,8 @@ import com.alibaba.fastjson.JSON;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
 import io.github.qyvlik.springhmacrestverify.common.properties.HmacVerifyProperties;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.CachingRequestFilter;
-import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignatureBuilder;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignature;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.PlainText;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
@@ -61,17 +62,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("GET")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body("")
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -103,17 +107,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("HEAD")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body("")
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -143,17 +150,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("POST")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -191,17 +201,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("POST")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -239,17 +252,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("PUT")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -287,17 +303,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("DELETE")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -335,17 +354,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("POST")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -384,17 +406,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("POST")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -432,17 +457,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("DELETE")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
@@ -481,17 +509,20 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignatureBuilder.create()
+        String signature = HmacSignature.builder().plainText(PlainText.builder()
                 .method("PUT")
                 .scheme("http")
                 .host("localhost")
-                .port(8080)
                 .path(uri)
-                .query(query)
+                .query("?" + query)
                 .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .signature(secretKey, algorithm);
+                .build())
+                .algorithm(algorithm)
+                .secretKey(secretKey)
+                .build()
+                .signature();
 
         String authorization = algorithm + ":" + signature;
 
