@@ -6,14 +6,13 @@ import io.github.qyvlik.springhmacrestverify.common.properties.HmacVerifyPropert
 import io.github.qyvlik.springhmacrestverify.modules.hmac.CachingRequestFilter;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignature;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.PlainText;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.FixMethodOrder;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.MethodSorters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -26,12 +25,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+@Slf4j
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class SpringHmacRestVerifyApplicationTests {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private WebApplicationContext context;
@@ -93,7 +91,7 @@ public class SpringHmacRestVerifyApplicationTests {
         Assert.assertNotNull(responseObject);
         Assert.assertNull(responseObject.getError());
 
-        logger.info("test001_time_with_form_type result:{}", responseObject.getResult());
+        log.info("test001_time_with_form_type result:{}", responseObject.getResult());
     }
 
     @Test

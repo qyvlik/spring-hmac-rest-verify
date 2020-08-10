@@ -3,9 +3,8 @@ package io.github.qyvlik.springhmacrestverify.modules.client;
 import com.alibaba.fastjson.JSON;
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
-import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Interceptor;
 import okhttp3.Request;
@@ -24,8 +23,7 @@ import java.util.Map;
 
 @Slf4j
 @Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Builder
 public class OkHTTPHMACInterceptor implements Interceptor {
     private static final String DELIMITER = "\n";
     private String algorithm;

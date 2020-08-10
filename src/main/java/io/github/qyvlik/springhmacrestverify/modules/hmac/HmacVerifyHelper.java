@@ -86,7 +86,7 @@ public class HmacVerifyHelper {
         if (hmacSignature == null) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI()
-                    + " get hmac signature builder from request failure");
+                    + " get hmac signature from request failure");
             return fail(500, responseObject);
         }
 

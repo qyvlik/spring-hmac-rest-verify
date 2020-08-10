@@ -16,8 +16,10 @@ public class HmacRequestTest {
     final private String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
     final private String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
 
-    private OkHTTPHMACInterceptor okHTTPHMACInterceptor =
-            new OkHTTPHMACInterceptor("HmacSHA256", secretKey);
+    private OkHTTPHMACInterceptor okHTTPHMACInterceptor = OkHTTPHMACInterceptor.builder()
+            .algorithm("HmacSHA256")
+            .secretKey(secretKey)
+            .build();
 
     @Test
     public void test001_time_with_form_type() throws Exception {

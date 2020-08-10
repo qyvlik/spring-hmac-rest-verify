@@ -22,10 +22,5 @@ hmac-verify:
 
 logging:
   level:
-    io:
-      github:
-        qyvlik:
-          springhmacrestverify:
-            modules:
-              verify:
-                interceptor: DEBUG
+    io.github.qyvlik.springhmacrestverify.modules.hmac: DEBUG
+    io.github.qyvlik.springhmacrestverify.modules.client: DEBUG
