@@ -68,6 +68,11 @@ public class HmacHelper {
         return this.encoding;
     }
 
+    /**
+     * querystring if not blank, start with '?'
+     * @return
+     * @throws UnsupportedEncodingException
+     */
     private String getQueryString() throws UnsupportedEncodingException {
         return StringUtils.isBlank(getRequest().getQueryString())
                 ? ""

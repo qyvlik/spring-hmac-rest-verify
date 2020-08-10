@@ -164,6 +164,7 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
             if (isMock) {
                 return null;
             }
+
             if (!shouldParse(request)) {
                 return null;
             }

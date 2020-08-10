@@ -2,8 +2,9 @@ package io.github.qyvlik.springhmacrestverify.common.config;
 
 import io.github.qyvlik.springhmacrestverify.common.properties.HmacVerifyProperties;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.CachingRequestFilter;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacCredentialsProvider;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacConfig;
 import io.github.qyvlik.springhmacrestverify.modules.verify.interceptor.HmacInterceptor;
-import io.github.qyvlik.springhmacrestverify.modules.verify.provider.CredentialsProvider;
 import io.github.qyvlik.springhmacrestverify.modules.verify.provider.impl.CredentialsProviderMapImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -36,7 +37,7 @@ public class HmacVerifyBeanConfig {
     }
 
     @Bean
-    public CredentialsProvider credentialsProvider() {
+    public HmacCredentialsProvider credentialsProvider() {
 
         return CredentialsProviderMapImpl.Builder
                 .create()
@@ -46,9 +47,9 @@ public class HmacVerifyBeanConfig {
 
     @Bean
     public HmacInterceptor hmacInterceptor(
-            @Autowired @Qualifier("credentialsProvider") CredentialsProvider credentialsProvider) {
+            @Autowired @Qualifier("credentialsProvider") HmacCredentialsProvider credentialsProvider) {
 
-        HmacInterceptor.Config config = HmacInterceptor.Config.builder()
+        HmacConfig config = HmacConfig.builder()
                 .provider(credentialsProvider)
                 .headerOfAccessKey(hmacVerifyProperties.getHeader().getAccessKey())
                 .headerOfAuthorization(hmacVerifyProperties.getHeader().getAuthorization())

@@ -1,12 +1,12 @@
 package io.github.qyvlik.springhmacrestverify.modules.verify.provider.impl;
 
 import com.google.common.collect.Maps;
-import io.github.qyvlik.springhmacrestverify.modules.verify.provider.CredentialsProvider;
+import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacCredentialsProvider;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Map;
 
-public class CredentialsProviderMapImpl implements CredentialsProvider {
+public class CredentialsProviderMapImpl implements HmacCredentialsProvider {
 
     private Map<String, String> keyMap = Maps.newConcurrentMap();
 
@@ -49,7 +49,7 @@ public class CredentialsProviderMapImpl implements CredentialsProvider {
             return this;
         }
 
-        public CredentialsProvider builder() {
+        public HmacCredentialsProvider builder() {
             return this.provider;
         }
     }

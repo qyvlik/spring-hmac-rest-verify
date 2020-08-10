@@ -1,6 +1,9 @@
-package io.github.qyvlik.springhmacrestverify.modules.verify.provider;
+package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
-public interface CredentialsProvider {
+/**
+ * HMAC ak sk provider
+ */
+public interface HmacCredentialsProvider {
 
     Credential getCredential(String accessKey);
 

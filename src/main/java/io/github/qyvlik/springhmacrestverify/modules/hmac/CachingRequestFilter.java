@@ -9,6 +9,9 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * must set the order as Ordered.HIGHEST_PRECEDENCE
+ */
 public class CachingRequestFilter implements Filter {
 
     // support method: GET, HEAD, POST, PUT, DELETE
