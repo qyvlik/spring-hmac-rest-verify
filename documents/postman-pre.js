@@ -4,7 +4,6 @@
 const accessKeyEnv = 'AccessKey';
 const secretKeyEnv = 'SecretKey';
 const hostEnv = 'HmacHost';
-const nonceEnv = '$timestamp';
 const algorithm = 'HmacSHA256';
 
 /**
@@ -48,7 +47,7 @@ const query = pm.request.url.query.count() !== 0 ? ('?' + pm.request.url.query) 
 const content_type = pm.request.headers.get('Content-Type') || '';
 // host not include port
 const host = (pm.environment.get(hostEnv) || '').split(":")[0];
-const nonce = pm.environment.get(nonceEnv) || '';
+const nonce = Date.now() + '';
 const body = pm.request.body || '';
 const accessKey = pm.variables.get(accessKeyEnv) || '';
 const secretKey = pm.variables.get(secretKeyEnv) || '';
