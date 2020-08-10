@@ -27,7 +27,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OkHTTPHMACInterceptor implements Interceptor {
-
+    private static final String DELIMITER = "\n";
     private String algorithm;
     private String secretKey;
 
@@ -49,7 +49,6 @@ public class OkHTTPHMACInterceptor implements Interceptor {
 
     private Request hmacSignature(Chain chain) throws IOException {
         Request request = chain.request();
-        final String DELIMITER = "\n";
         final String method = request.method();
         final String scheme = request.url().scheme();
         final String host = request.url().host();
@@ -89,8 +88,6 @@ public class OkHTTPHMACInterceptor implements Interceptor {
         if (body != null) {
             Buffer buffer = new Buffer();
             body.writeTo(buffer);
-
-
             return buffer.readString(Charsets.UTF_8);
         }
         return "";
