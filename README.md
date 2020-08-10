@@ -42,48 +42,22 @@ NONCE
 
 ## main code
 
-See the package `io.github.qyvlik.springhmacrestverify.modules.hmac` 
-and `io.github.qyvlik.springhmacrestverify.modules.verify`.
+See the package `io.github.qyvlik.springhmacrestverify.modules.hmac`.
 
 - `CachingRequestFilter` : read the payload from request, so you don't need sorting the form-data.
-- `HmacSignatureHelper`: build hmac signature from `HttpServletRequestWrapper`.
-- `HmacInterceptor`: verify the client signature
+- `HmacSignature`: build hmac signature from `HttpServletRequestWrapper`.
+- `HmacVerifyHelper`: verify the client signature
 
 ## example
 
 ### server side
 
-See the package `io.github.qyvlik.springhmacrestverify.modules.verify`.
-
-- `HmacInterceptor`: verify the client signature, you can consult it for you own server.
+- `HmacVerifyHelper`: verify the client signature, you can consult it for you own server.
 - `CredentialsProviderMapImpl`: simple provider for access-key, secret-key.
 
 ### client side by okhttp
 
-```yaml
-String accessKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
-String secretKey = "f9ecb7d7-f5e5-40e1-bc9b-6b5e4ed6cfe0";
-Request request = HmacRequestBuilder.create()
-        .method("GET")
-        .url(HttpUrl.parse("http://localhost:8080/api/v1/time"))
-        .contentType("application/x-www-form-urlencoded")
-        .body(null)
-        .charset(Charset.forName("UTF-8"))
-        .headerOfAccessKey("accessKey")
-        .headerOfAuthorization("Authorization")
-        .headerOfNonce("nonce")
-        .build(accessKey, secretKey, "HmacSHA256");
-
-OkHttpClient okHttpClient = new OkHttpClient();
-Call call = okHttpClient.newCall(request);
-
-Response response = call.execute();
-
-Assert.assertNotNull(response);
-Assert.assertNotNull(response.body());
-```
-
-See the more examples in [HmacRequestBuilderTest.java](src/test/java/io/github/qyvlik/springhmacrestverify/modules/client/HmacRequestBuilderTest.java).
+- `OkHTTPHMACInterceptor`: okhttp interceptor for hmac
 
 ### test case
 
