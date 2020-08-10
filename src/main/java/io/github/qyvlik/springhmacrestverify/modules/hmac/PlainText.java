@@ -1,17 +1,13 @@
 package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
 @Data
 @Builder
-@NoArgsConstructor
-@AllArgsConstructor
 public class PlainText {
     public static final String DELIMITER = "\n";
-    
+
     private String method;
     private String scheme;
     private String host;
@@ -20,7 +16,7 @@ public class PlainText {
     private String contentType;
     private String body;
     private String nonce;
-    
+
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();

@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import io.github.qyvlik.springhmacrestverify.common.base.ResponseObject;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -166,7 +165,6 @@ public class HmacVerifyHelper {
     }
 
     @Data
-    @AllArgsConstructor
     @Builder
     public static class VerifyResponse {
         /**

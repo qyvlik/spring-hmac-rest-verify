@@ -1,9 +1,7 @@
 package io.github.qyvlik.springhmacrestverify.modules.hmac;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.springframework.http.HttpInputMessage;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.FormHttpMessageConverter;
@@ -16,7 +14,6 @@ import org.springframework.util.StringUtils;
 
 import javax.servlet.ReadListener;
 import javax.servlet.ServletInputStream;
-import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 import java.io.ByteArrayInputStream;
@@ -132,8 +129,6 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
 
 
     @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
     @Builder
     public static class WrapperBuilder {
 

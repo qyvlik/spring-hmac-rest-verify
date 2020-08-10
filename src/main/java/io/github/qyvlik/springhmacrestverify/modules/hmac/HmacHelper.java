@@ -70,6 +70,7 @@ public class HmacHelper {
 
     /**
      * querystring if not blank, start with '?'
+     *
      * @return
      * @throws UnsupportedEncodingException
      */
