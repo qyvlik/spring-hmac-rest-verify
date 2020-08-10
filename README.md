@@ -58,6 +58,7 @@ See the package `io.github.qyvlik.springhmacrestverify.modules.hmac`.
 ### client side by okhttp
 
 - `OkHTTPHMACInterceptor`: okhttp interceptor for hmac
+- [`postman-pre.js`](./documents/postman-pre.js): postman hmac signature pre-script
 
 ### test case
 
