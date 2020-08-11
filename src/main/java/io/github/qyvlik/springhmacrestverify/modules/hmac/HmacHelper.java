@@ -37,6 +37,9 @@ public class HmacHelper {
                     ;
         } catch (IOException e) {
             log.error("createBuilderFromRequest failure :{}", e.getMessage());
+            if (log.isTraceEnabled()) {
+                log.trace("createBuilderFromRequest failure : ", e);
+            }
         }
         return null;
     }
