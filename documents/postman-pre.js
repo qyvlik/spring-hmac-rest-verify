@@ -40,6 +40,22 @@ function signature({method, protocol, host, path, query, content_type, body, non
     return signatureBase64;
 }
 
+function getBody(request) {
+    // postman RequestBody
+    const body = request.body;
+    if (body) {
+        // mode: raw, formdata, urlencoded, file
+        if (body.mode === 'raw') {
+            return body.raw;
+        }
+        if (body.mode === 'urlencoded') {
+            return encodeURI(body.toString());
+        }
+        throw new Error(`not support RequestBody.mode:${body.mode}`);
+    }
+    return '';
+}
+
 const method = pm.request.method;
 const protocol = pm.request.url.protocol;
 const path = '/' + pm.request.url.path.join('/');
@@ -48,7 +64,7 @@ const content_type = pm.request.headers.get('Content-Type') || '';
 // host not include port
 const host = (pm.environment.get(hostEnv) || '').split(":")[0];
 const nonce = Date.now() + '';
-const body = pm.request.body || '';
+const body =  getBody(pm.request);
 const accessKey = pm.variables.get(accessKeyEnv) || '';
 const secretKey = pm.variables.get(secretKeyEnv) || '';
 
