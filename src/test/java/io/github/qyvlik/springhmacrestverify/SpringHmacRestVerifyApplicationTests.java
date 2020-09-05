@@ -408,7 +408,6 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/post-json";
 
-        // todo encode
         String query = String.format("%s=%s",
                 URLEncoder.encode("param3", "UTF-8"),
                 URLEncoder.encode("3中文", "UTF-8"));
