@@ -409,7 +409,9 @@ public class SpringHmacRestVerifyApplicationTests {
         String uri = "/api/v1/post-json";
 
         // todo encode
-        String query = "param3=3中文";
+        String query = String.format("%s=%s",
+                URLEncoder.encode("param3", "UTF-8"),
+                URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
@@ -433,7 +435,7 @@ public class SpringHmacRestVerifyApplicationTests {
         String authorization = algorithm + ":" + signature;
 
         String responseString = this.mockMvc.perform(
-                post(uri + "?" + query)
+                post(uri + "?" + URLDecoder.decode(query, "UTF-8"))
                         .header(properties.getHeader().getAccessKey(), accessKey)
                         .header(properties.getHeader().getAuthorization(), authorization)
                         .header(properties.getHeader().getNonce(), nonce)
@@ -460,8 +462,9 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/delete-json";
 
-        // todo encode
-        String query = "param3=3中文";
+        String query = String.format("%s=%s",
+                URLEncoder.encode("param3", "UTF-8"),
+                URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
@@ -485,7 +488,7 @@ public class SpringHmacRestVerifyApplicationTests {
         String authorization = algorithm + ":" + signature;
 
         String responseString = this.mockMvc.perform(
-                delete(uri + "?" + query)
+                delete(uri + "?" + URLDecoder.decode(query, "UTF-8"))
                         .header(properties.getHeader().getAccessKey(), accessKey)
                         .header(properties.getHeader().getAuthorization(), authorization)
                         .header(properties.getHeader().getNonce(), nonce)
@@ -513,8 +516,9 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/put-json";
 
-        // todo encode
-        String query = "param3=3中文";
+        String query = String.format("%s=%s",
+                URLEncoder.encode("param3", "UTF-8"),
+                URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
@@ -538,7 +542,7 @@ public class SpringHmacRestVerifyApplicationTests {
         String authorization = algorithm + ":" + signature;
 
         String responseString = this.mockMvc.perform(
-                put(uri + "?" + query)
+                put(uri + "?" + URLDecoder.decode(query, "UTF-8"))
                         .header(properties.getHeader().getAccessKey(), accessKey)
                         .header(properties.getHeader().getAuthorization(), authorization)
                         .header(properties.getHeader().getNonce(), nonce)
