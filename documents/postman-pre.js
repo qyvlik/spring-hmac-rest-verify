@@ -49,22 +49,37 @@ function getBody(request) {
             return body.raw;
         }
         if (body.mode === 'urlencoded') {
-            return encodeURI(body.toString());
+            const paramList = [];
+            body.urlencoded.each((param) => {
+                paramList.push(`${param.key}=${encodeURIComponent(param.value)}`);
+            });
+            return paramList.join("&");
         }
         throw new Error(`not support RequestBody.mode:${body.mode}`);
     }
     return '';
 }
 
+function getQuery(request) {
+    if (request.url.query.count() === 0) {
+        return "";
+    }
+    const paramList = [];
+    request.url.query.each((param) => {
+        paramList.push(`${param.key}=${encodeURI(param.value)}`);
+    });
+    return "?" + paramList.join("&");
+}
+
 const method = pm.request.method;
 const protocol = pm.request.url.protocol;
 const path = '/' + pm.request.url.path.join('/');
-const query = pm.request.url.query.count() !== 0 ? ('?' + pm.request.url.query) : pm.request.url.query;
+const query = getQuery(pm.request);
 const content_type = pm.request.headers.get('Content-Type') || '';
 // host not include port
 const host = (pm.environment.get(hostEnv) || '').split(":")[0];
 const nonce = Date.now() + '';
-const body =  getBody(pm.request);
+const body = getBody(pm.request);
 const accessKey = pm.variables.get(accessKeyEnv) || '';
 const secretKey = pm.variables.get(secretKeyEnv) || '';
 

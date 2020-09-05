@@ -52,6 +52,8 @@ public class CachingRequestWrapper extends HttpServletRequestWrapper {
                             + " not equals content-length : " + contentLength
                             + ", does the request inputStream already closed?");
                 }
+            } else {
+                payload = new byte[0];
             }
         }
         return payload;

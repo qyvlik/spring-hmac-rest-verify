@@ -20,6 +20,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -345,14 +348,18 @@ public class SpringHmacRestVerifyApplicationTests {
         String secretKey = properties.getSecretKey();
 
         String uri = "/api/v1/post-form-2";
+        String query = String.format("%s=%s",
+                URLEncoder.encode("param3", "UTF-8"),
+                URLEncoder.encode("3中文", "UTF-8"));
 
-        String query = "param3=3中文";
-
-        String body = "param1=1&param2=2中文";
+        String body = String.format("%s=%s&%s=%s",
+                URLEncoder.encode("param1", "UTF-8"),
+                URLEncoder.encode("1", "UTF-8"),
+                URLEncoder.encode("param2", "UTF-8"),
+                URLEncoder.encode("2中文", "UTF-8"));
 
         String nonce = System.currentTimeMillis() + "";
-
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
+        PlainText plainText = PlainText.builder()
                 .method("POST")
                 .scheme("http")
                 .host("localhost")
@@ -361,7 +368,10 @@ public class SpringHmacRestVerifyApplicationTests {
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
                 .body(body)
                 .nonce(nonce)
-                .build())
+                .build();
+        log.info("plainText:{}", plainText);
+        String signature = HmacSignature.builder()
+                .plainText(plainText)
                 .algorithm(algorithm)
                 .secretKey(secretKey)
                 .build()
@@ -370,7 +380,7 @@ public class SpringHmacRestVerifyApplicationTests {
         String authorization = algorithm + ":" + signature;
 
         String responseString = this.mockMvc.perform(
-                post(uri + "?" + query)
+                post(uri + "?" + URLDecoder.decode(query, "UTF-8"))
                         .header(properties.getHeader().getAccessKey(), accessKey)
                         .header(properties.getHeader().getAuthorization(), authorization)
                         .header(properties.getHeader().getNonce(), nonce)
@@ -398,6 +408,7 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/post-json";
 
+        // todo encode
         String query = "param3=3中文";
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
@@ -449,6 +460,7 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/delete-json";
 
+        // todo encode
         String query = "param3=3中文";
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
@@ -501,6 +513,7 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/put-json";
 
+        // todo encode
         String query = "param3=3中文";
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";

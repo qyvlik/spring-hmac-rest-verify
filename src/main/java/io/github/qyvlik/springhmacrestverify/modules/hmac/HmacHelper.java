@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 
 @Slf4j
 @Builder
@@ -61,7 +60,7 @@ public class HmacHelper {
         }
         String host = getRequest().getHeader("host");
         if (StringUtils.isNotBlank(host)) {
-            host = host.replaceAll(":" + getRequest().getServerPort(), "");
+            host = host.split(":")[0];
         }
         return host;
     }
@@ -79,9 +78,15 @@ public class HmacHelper {
     private String getQueryString() throws UnsupportedEncodingException {
         return StringUtils.isBlank(getRequest().getQueryString())
                 ? ""
-                : "?" + URLDecoder.decode(getRequest().getQueryString(), getEncoding());
+                : "?" + getRequest().getQueryString();
     }
 
+    /**
+     * don't
+     *
+     * @return
+     * @throws IOException
+     */
     private String getBody() throws IOException {
         String body = "";
         byte[] content = getRequest().getContentAsByteArray();

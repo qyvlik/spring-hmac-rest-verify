@@ -51,7 +51,7 @@ public class OkHTTPHMACInterceptor implements Interceptor {
         final String scheme = request.url().scheme();
         final String host = request.url().host();
         final String path = request.url().encodedPath();
-        final String query = StringUtils.isBlank(request.url().query()) ? "" : "?" + request.url().query();
+        final String query = StringUtils.isBlank(request.url().encodedQuery()) ? "" : "?" + request.url().encodedQuery();
         final String contentType = getContentType(request);
         final String body = getRawContentFromBody(request.body());
         final String nonce = System.currentTimeMillis() + "";
@@ -70,10 +70,12 @@ public class OkHTTPHMACInterceptor implements Interceptor {
             log.error("{} failure : {}", algorithm, e.getMessage());
         }
         final String authorization = algorithm + ": " + signatureStr;
-        Map<String, String> sign = Maps.newHashMap();
-        sign.put("plainText", plainText);
-        sign.put("signature", signatureStr);
-        log.debug("sign:{}", JSON.toJSONString(sign));
+        if (log.isDebugEnabled()) {
+            Map<String, String> sign = Maps.newHashMap();
+            sign.put("plainText", plainText);
+            sign.put("signature", signatureStr);
+            log.debug("sign:{}", JSON.toJSONString(sign));
+        }
         return request.newBuilder()
                 .removeHeader("Nonce")
                 .addHeader("Nonce", nonce)
@@ -96,6 +98,12 @@ public class OkHTTPHMACInterceptor implements Interceptor {
                 && request.body().contentType() != null) {
             return request.body().contentType().toString();
         }
-        return request.header("Content-Type");
+        String contentType = request.header("Content-Type");
+
+        if (StringUtils.isBlank(contentType)) {
+            return "";
+        }
+
+        return contentType;
     }
 }

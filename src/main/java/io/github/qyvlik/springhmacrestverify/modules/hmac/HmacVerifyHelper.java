@@ -148,26 +148,42 @@ public class HmacVerifyHelper {
         if (!serverSignature.equals(clientSignature)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " verify signature failure");
-            return fail(500, responseObject);
+            return fail(500, responseObject, sign, nonce);
         }
 
         // check nonce
         if (credential.getNonceChecker() != null && !credential.getNonceChecker().check(nonce)) {
             ResponseObject<String> responseObject = new ResponseObject<>(
                     20500, request.getRequestURI() + " check nonce failure");
-            return fail(401, responseObject);
+            return fail(401, responseObject, sign, nonce);
         }
 
-        return VerifyResult.ok();
+        return VerifyResult.ok(sign, nonce);
     }
 
-    private static VerifyResult fail(int httpStatus, ResponseObject<String> responseObject) {
+    private static VerifyResult fail(int httpStatus,
+                                     ResponseObject<String> responseObject) {
         return VerifyResult
                 .builder()
                 .success(false)
                 .httpStatus(httpStatus)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
                 .body(JSON.toJSONString(responseObject))
+                .build();
+    }
+
+    private static VerifyResult fail(int httpStatus,
+                                     ResponseObject<String> responseObject,
+                                     Map<String, String> sign,
+                                     String nonce) {
+        return VerifyResult
+                .builder()
+                .success(false)
+                .httpStatus(httpStatus)
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .body(JSON.toJSONString(responseObject))
+                .sign(sign)
+                .nonce(nonce)
                 .build();
     }
 
@@ -188,14 +204,18 @@ public class HmacVerifyHelper {
          */
         private String contentType;
 
+        private String nonce;
+
         /**
          * response body
          */
         private String body;
 
+        private Map<String, String> sign;
 
-        public static VerifyResult ok() {
-            return VerifyResult.builder().success(true).build();
+
+        public static VerifyResult ok(Map<String, String> sign, String nonce) {
+            return VerifyResult.builder().success(true).sign(sign).nonce(nonce).build();
         }
     }
 
