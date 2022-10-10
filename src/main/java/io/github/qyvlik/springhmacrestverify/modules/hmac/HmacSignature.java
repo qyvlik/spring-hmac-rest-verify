@@ -31,6 +31,18 @@ public class HmacSignature {
         return Base64.getEncoder().encodeToString(signatureBytes);
     }
 
+    public static byte[] signatureByte(String algorithm, String plainText, String secretKey)
+            throws NoSuchAlgorithmException, InvalidKeyException {
+        final Mac digest = Mac.getInstance(algorithm);
+        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), algorithm);
+        digest.init(secretKeySpec);
+        digest.update(plainText.getBytes());
+
+        final byte[] signatureBytes = digest.doFinal();
+        digest.reset();
+        return signatureBytes;
+    }
+
     public String signature() {
         try {
             return HmacSignature.signature(algorithm, plainText.toString(), secretKey);

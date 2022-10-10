@@ -7,31 +7,29 @@ import io.github.qyvlik.springhmacrestverify.modules.hmac.CachingRequestFilter;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.HmacSignature;
 import io.github.qyvlik.springhmacrestverify.modules.hmac.PlainText;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.FixMethodOrder;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
+
 @Slf4j
-@RunWith(SpringRunner.class)
 @SpringBootTest
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
+@TestMethodOrder(MethodOrderer.MethodName.class)
 public class SpringHmacRestVerifyApplicationTests {
 
     @Autowired
@@ -44,11 +42,9 @@ public class SpringHmacRestVerifyApplicationTests {
     private MockMvc mockMvc;
     private String algorithm;
 
-    @Before
+    @BeforeEach
     public void setup() {
-        mockMvc = webAppContextSetup(this.context)
-                .addFilter(cachingRequestFilter, "/api/v1/*")
-                .build();
+        mockMvc = webAppContextSetup(this.context).addFilter(cachingRequestFilter, "/api/v1/*").build();
         algorithm = "HmacSHA256";
     }
 
@@ -63,36 +59,15 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("GET")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body("")
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("GET").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body("").nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                get(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn().getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(get(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         log.info("test001_time_with_form_type result:{}", responseObject.getResult());
     }
@@ -108,34 +83,12 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("HEAD")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body("")
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("HEAD").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body("").nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                head(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
-        Assert.assertEquals(responseString, "");
+        String responseString = this.mockMvc.perform(head(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
+        assertEquals(responseString, "");
     }
 
     @Test
@@ -151,42 +104,19 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("POST")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("POST").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                post(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(post(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
     @Test
@@ -202,42 +132,19 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("POST")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("POST").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                post(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(post(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
     @Test
@@ -253,42 +160,19 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("PUT")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("PUT").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                put(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(put(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
     @Test
@@ -304,42 +188,19 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("DELETE")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("DELETE").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                delete(uri + "?" + query)
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(delete(uri + "?" + query).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
     @Test
@@ -348,56 +209,26 @@ public class SpringHmacRestVerifyApplicationTests {
         String secretKey = properties.getSecretKey();
 
         String uri = "/api/v1/post-form-2";
-        String query = String.format("%s=%s",
-                URLEncoder.encode("param3", "UTF-8"),
-                URLEncoder.encode("3中文", "UTF-8"));
+        String query = String.format("%s=%s", URLEncoder.encode("param3", "UTF-8"), URLEncoder.encode("3中文", "UTF-8"));
 
-        String body = String.format("%s=%s&%s=%s",
-                URLEncoder.encode("param1", "UTF-8"),
-                URLEncoder.encode("1", "UTF-8"),
-                URLEncoder.encode("param2", "UTF-8"),
-                URLEncoder.encode("2中文", "UTF-8"));
+        String body = String.format("%s=%s&%s=%s", URLEncoder.encode("param1", "UTF-8"), URLEncoder.encode("1", "UTF-8"), URLEncoder.encode("param2", "UTF-8"), URLEncoder.encode("2中文", "UTF-8"));
 
         String nonce = System.currentTimeMillis() + "";
-        PlainText plainText = PlainText.builder()
-                .method("POST")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build();
+        PlainText plainText = PlainText.builder().method("POST").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).body(body).nonce(nonce).build();
         log.info("plainText:{}", plainText);
-        String signature = HmacSignature.builder()
-                .plainText(plainText)
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(plainText).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                post(uri + "?" + URLDecoder.decode(query, "UTF-8"))
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(post(uri + "?" + URLDecoder.decode(query, "UTF-8")).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_FORM_URLENCODED_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
 
@@ -408,50 +239,25 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/post-json";
 
-        String query = String.format("%s=%s",
-                URLEncoder.encode("param3", "UTF-8"),
-                URLEncoder.encode("3中文", "UTF-8"));
+        String query = String.format("%s=%s", URLEncoder.encode("param3", "UTF-8"), URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("POST")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("POST").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                post(uri + "?" + URLDecoder.decode(query, "UTF-8"))
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(post(uri + "?" + URLDecoder.decode(query, "UTF-8")).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
     @Test
@@ -461,50 +267,25 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/delete-json";
 
-        String query = String.format("%s=%s",
-                URLEncoder.encode("param3", "UTF-8"),
-                URLEncoder.encode("3中文", "UTF-8"));
+        String query = String.format("%s=%s", URLEncoder.encode("param3", "UTF-8"), URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("DELETE")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("DELETE").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                delete(uri + "?" + URLDecoder.decode(query, "UTF-8"))
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(delete(uri + "?" + URLDecoder.decode(query, "UTF-8")).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 
 
@@ -515,49 +296,24 @@ public class SpringHmacRestVerifyApplicationTests {
 
         String uri = "/api/v1/put-json";
 
-        String query = String.format("%s=%s",
-                URLEncoder.encode("param3", "UTF-8"),
-                URLEncoder.encode("3中文", "UTF-8"));
+        String query = String.format("%s=%s", URLEncoder.encode("param3", "UTF-8"), URLEncoder.encode("3中文", "UTF-8"));
 
         String body = "{\"param1\": \"1\",\"param2\": \"2中文\"}";
 
         String nonce = System.currentTimeMillis() + "";
 
-        String signature = HmacSignature.builder().plainText(PlainText.builder()
-                .method("PUT")
-                .scheme("http")
-                .host("localhost")
-                .path(uri)
-                .query("?" + query)
-                .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                .body(body)
-                .nonce(nonce)
-                .build())
-                .algorithm(algorithm)
-                .secretKey(secretKey)
-                .build()
-                .signature();
+        String signature = HmacSignature.builder().plainText(PlainText.builder().method("PUT").scheme("http").host("localhost").path(uri).query("?" + query).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).body(body).nonce(nonce).build()).algorithm(algorithm).secretKey(secretKey).build().signature();
 
         String authorization = algorithm + ":" + signature;
 
-        String responseString = this.mockMvc.perform(
-                put(uri + "?" + URLDecoder.decode(query, "UTF-8"))
-                        .header(properties.getHeader().getAccessKey(), accessKey)
-                        .header(properties.getHeader().getAuthorization(), authorization)
-                        .header(properties.getHeader().getNonce(), nonce)
-                        .contentType(MediaType.APPLICATION_JSON_UTF8_VALUE)
-                        .content(body)
-        ).andExpect(status().isOk())
-                .andExpect(content().contentType("application/json;charset=UTF-8"))
-                .andReturn()
-                .getResponse().getContentAsString();
+        String responseString = this.mockMvc.perform(put(uri + "?" + URLDecoder.decode(query, "UTF-8")).header(properties.getHeader().getAccessKey(), accessKey).header(properties.getHeader().getAuthorization(), authorization).header(properties.getHeader().getNonce(), nonce).contentType(MediaType.APPLICATION_JSON_UTF8_VALUE).content(body)).andExpect(status().isOk()).andExpect(content().contentType("application/json;charset=UTF-8")).andReturn().getResponse().getContentAsString();
 
         ResponseObject responseObject = JSON.parseObject(responseString).toJavaObject(ResponseObject.class);
-        Assert.assertNotNull(responseObject);
-        Assert.assertNull(responseObject.getError());
+        assertNotNull(responseObject);
+        assertNull(responseObject.getError());
 
         final String resultString = "param1: 1, param2: 2中文, param3: 3中文";
 
-        Assert.assertEquals(responseObject.getResult().toString(), resultString);
+        assertEquals(responseObject.getResult().toString(), resultString);
     }
 }
